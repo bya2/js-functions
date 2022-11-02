@@ -1,0 +1,110 @@
+{
+  "root": true,
+
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "jest": true
+  },
+
+  "extends": [
+    "eslint:recommended",
+    "plugin:import/recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+
+  "overrides": [],
+
+  "parser": "@typescript-eslint/parser",
+
+  "parserOptions": {
+    "project": ["./tsconfig.json"],
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+
+  "plugins": ["import", "@typescript-eslint", "unused-imports", "prettier"],
+
+  "settings": {
+    "import/resolver": {
+      "typesciprt": {
+        "project": "./tsconfig.json"
+      },
+      "node": {
+        "paths": ["src"],
+        "extensions": [".js", ".ts"],
+        "moduleDirectory": [".yarn", "src"]
+      }
+    },
+    "import/extensions": [".js", ".jsx", ".ts", ".tsx"],
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    }
+  },
+
+  "rules": {
+    // Plugins
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "": "never",
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
+    "import/first": "error",
+    "import/newline-after-import": "error", // 'import'문과 컨텍스트 라인을 하나의 라인으로 분리
+    "import/no-unresolved": "off", // 타입스크립트 등의 절대 경로(@/)의 파일을 'import'할 때 'unresolved'되지 않도록 하는 규칙 (https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/no-unresolved.md)
+    "import/no-named-as-default-member": "off", // import 스프레드 여부에 대한 경고
+
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-explicit-any": "off", // any 허용
+    "@typescript-eslint/no-inferrable-types": "off", //
+    "@typescript-eslint/no-empty-function": "off", // 함수 빈 블록 허용
+    "@typescript-eslint/no-empty-interface": "off", // 인터페이스 빈 블록 허용
+    "@typescript-eslint/no-non-null-assertion": "off", //
+
+    "unused-imports/no-unused-imports": "error", // 사용되지 않는 'import'문이 없도록 하는 규칙
+    "unused-imports/no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_"
+      }
+    ],
+
+    "prettier/prettier": "error",
+
+    // Possible Problems
+    "no-use-before-define": "off", // 변수 선언의 순서에 따라 사용에 제한을 두는 규칙
+    "no-duplicate-imports": "off", // 중복되는 'import'가 없도록 하는 규칙
+
+    // Suggestions
+    "accessor-pairs": "off", // setter, getter 한 쌍 강요
+    "eqeqeq": ["error", "smart"], // === 강요하는 규칙 (smart: 리터럴 비교 제외, typeof 값 평가 제외, null 비교 제외)
+    // "arrow-body-style": ["error", "as-needed"], // 함수 괄호 안에서 반환하도록 제한하는 규칙 (as-needed: 단순한 GETTER의 경우 제외)
+    "prefer-arrow-callback": "error", // 콜백 함수를 화살표 함수로 제한하는 규칙 (생성자 혹은 메서드 제외)
+
+    // Layout & Formatting
+    "no-empty": "off",
+    "template-curly-spacing": ["error", "never"], // 템플릿 리터럴 내의 표현식를 감싸는 괄호 안에서 공백 간격의 여부를 제한하는 규칙
+    "template-tag-spacing": ["error", "never"], // 함수와 템플릿 리터럴간의 간격에 대한 규칙
+    "wrap-iife": ["error", "inside", { "functionPrototypeMethods": true }], // 즉시 실행 함수를 둥근 괄호로 감싸는 위치를 제한하는 규칙
+    "wrap-regex": "error", // 정규식 리터럴을 둥근 괄호로 감싸야하는 규칙
+    "yield-star-spacing": ["error", "before"] // '제네레이터 함수 연산자'의 위치를 제한하는 규칙
+  },
+
+  "ignorePatterns": [
+    "lib/",
+    "node_modules/",
+    ".yarn/",
+    ".pnp.cjs",
+    "src/**/*.d.ts",
+    "src/**/*.test.ts"
+  ]
+}
