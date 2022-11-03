@@ -27,7 +27,7 @@
 
   "settings": {
     "import/resolver": {
-      "typesciprt": {
+      "typescript": {
         "project": "./tsconfig.json"
       },
       "node": {
