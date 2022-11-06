@@ -1,102 +1,86 @@
-import Queue from "@/Array/Queue";
+import { WARN_NodeAlreadyExist, WARN_NoSuchNodeExist } from "@/misc/messages";
+import { AdjacencyListGraphInterface } from "@/misc/interfaces";
 
-interface NodeInterface<D> {
-  data: D;
-  adjacencyList: Set<NodeInterface<D>>;
-  isMarked: boolean;
-  mark: () => void;
-  clear: () => void;
-}
-
-export class Node<D extends object = any> implements NodeInterface<D> {
-  data;
-  adjacencyList;
-  isMarked = false;
-
-  constructor(data: D, adjacencyList = new Set<NodeInterface<D>>()) {
-    this.data = data;
-    this.adjacencyList = adjacencyList;
-  }
-
-  mark() {
-    this.isMarked = true;
-  }
-
-  clear() {
-    this.isMarked = false;
-  }
-}
-
-type CB<D> = (data: D, ...args: any[]) => [boolean, any[]];
-
-interface AdjacencyListGraphInterface<D> {
-  root: NodeInterface<D>;
-  createNode: (node: NodeInterface<D>) => void;
-  createEdge: (node1: NodeInterface<D>, node2: NodeInterface<D>) => void;
-  searchDepthFirst: (cb?: CB<D>, args?: any[]) => { height: number };
-  searchBreadthFirst: (cb?: CB<D>, args?: any[]) => { height: number };
-}
-
-export default class AdjacencyListGraph<D extends object = any>
-  extends Map<NodeInterface<D>, Set<NodeInterface<D>>>
-  implements AdjacencyListGraphInterface<D>
-{
-  public root;
-  constructor(root: NodeInterface<D>) {
-    super();
-    this.root = root;
-  }
-
-  createNode(node: NodeInterface<D>) {
-    if (!this.has(node)) {
-      this.set(node, new Set<NodeInterface<D>>());
+class AdjacencyListGraph<T = any> extends Map<T, Set<T>> implements AdjacencyListGraphInterface<T> {
+  /**
+   * 인접 리스트 그래프 노드 추가(인접 리스트의 키에 해당하는 노드를 추가)
+   * @param obj
+   */
+  add(obj: T): void {
+    if (this.has(obj)) {
+      console.warn(WARN_NodeAlreadyExist);
     } else {
-      //
+      this.set(obj, new Set<T>());
     }
   }
 
-  createEdge(node1: NodeInterface<D>, node2: NodeInterface<D>) {
-    if (this.has(node1) && this.has(node2)) {
-      this.get(node1)?.add(node2);
-      this.get(node2)?.add(node1);
-      node1.adjacencyList.add(node2);
-      node2.adjacencyList.add(node1);
+  /**
+   * 인접 리스트 그래프의 노드 간 간선 추가(인접 리스트의 키에 매핑되는 리스트에 노드를 추가)
+   * @param obj1
+   * @param obj2
+   */
+  connect(obj1: T, obj2: T): void {
+    if (this.has(obj1) && this.has(obj2)) {
+      this.get(obj1)!.add(obj2);
+      this.get(obj2)!.add(obj1);
     } else {
-      //
+      console.warn(WARN_NoSuchNodeExist);
     }
   }
 
-  connectAllNodes() {
-    for (const node1 of this.keys()) {
-      for (const node2 of this.keys()) {
-        if (!Object.is(node1, node2)) {
-          this.createEdge(node1, node2);
+  /**
+   * 인접 리스트 그래프의 모든 노드 간 간선 추가
+   */
+  connectAll(): void {
+    for (const obj1 of this.keys()) {
+      for (const obj2 of this.keys()) {
+        if (obj1 !== obj2) {
+          this.connect(obj1, obj2);
         }
       }
     }
   }
 
-  searchDepthFirst(cb?: CB<D>, args: any[] = []): { height: number } {
+  /**
+   * 인접 리스트 그래프의 노드 간 간선 제거(인접 리스트의 키에 매핑되는 리스트에서 노드를 제거)
+   * @param obj1
+   * @param obj2
+   */
+  disconnect(obj1: T, obj2: T): void {
+    if (this.has(obj1) && this.has(obj2)) {
+      this.get(obj1)!.delete(obj2);
+      this.get(obj2)!.delete(obj1);
+    } else {
+      console.warn(WARN_NoSuchNodeExist);
+    }
+  }
+
+  /**
+   * 깊이 우선 탐색을 통해 높이 등 그래프 정보를 리턴
+   * @param validator
+   */
+  searchDepthFirst(validator?: (data: T, ...args: any[]) => boolean): { height: number } {
+    const marked = new Map<T, boolean>();
     let height = 0;
 
-    const DFS = (curr: NodeInterface<D>, depth: number, params: any[]) => {
-      if (this.get(curr)) {
-        height = Math.max(height, depth);
+    const searchChild = (curr: T, depth: number = 0) => {
+      if (height < depth) height = depth;
 
-        curr.isMarked = true;
-        for (const adj of this.get(curr) as Set<NodeInterface<D>>) {
-          if (!adj.isMarked) {
-            const [condition, ...params] = cb?.(adj.data, ...args) || [true];
-            if (condition) DFS(adj, 0, params);
+      marked.set(curr, true);
+      for (const adj of this.get(curr)!) {
+        if (!marked.get(adj)) {
+          if (validator?.(adj) ?? true) {
+            searchChild(adj, depth + 1);
           }
         }
-        curr.isMarked = false;
       }
+      marked.set(curr, false);
     };
 
-    for (const node of this.keys()) {
-      const [condition, ...params] = cb?.(node.data, ...args) || [true];
-      if (condition) DFS(node, 0, params);
+    for (const root of this.keys()) {
+      if (validator?.(root) ?? true) {
+        searchChild(root, 0);
+      }
     }
 
     return {
@@ -104,27 +88,33 @@ export default class AdjacencyListGraph<D extends object = any>
     };
   }
 
-  searchBreadthFirst(cb?: CB<D>, args: any[] = []): { height: number } {
-    const queue = new Queue<NodeInterface<D>>();
-    queue.enqueue(this.root);
-    this.root.mark();
+  /**
+   * 너비 우선 탐색을 통해 노드의 개수, 높이 등 그래프 정보를 리턴
+   * @param root
+   */
+  searchBreadthFirst(root: T): { n: number; height: number } {
+    const queue = [root];
+    const marked = new Map([[root, true]]);
 
+    let n = 0;
     let depth = 0;
-    for (; !queue.isEmpty(); ++depth) {
-      for (let queueSize = queue.length; queueSize > 0; --queueSize) {
-        const curr = queue.dequeue() as NodeInterface<D>;
-
-        for (const adj of this.get(curr) as Set<NodeInterface<D>>) {
-          if (!adj.isMarked) {
-            queue.enqueue(adj);
-            adj.mark();
+    for (; queue.length > 0; ++depth) {
+      for (let size = queue.length; size > 0; --size, ++n) {
+        const curr = queue.shift()!;
+        for (const adj of this.get(curr)!) {
+          if (!marked.get(adj)) {
+            queue.push(adj);
+            marked.set(adj, true);
           }
         }
       }
     }
 
     return {
+      n,
       height: depth,
     };
   }
 }
+
+export default AdjacencyListGraph;

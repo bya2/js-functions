@@ -20,4 +20,6 @@ export { default as Cache } from "@/Map/Cache";
 
 export { default as AdjacencyListGraph } from "@/Map/AdjacencyListGraph";
 
+export { default as AdjacencyListNodeGraph } from "@/Map/AdjacencyListNodeGraph";
+
 export { default as ASCII } from "@/ASCII";
