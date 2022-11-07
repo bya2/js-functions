@@ -1,4 +1,6 @@
-export default class NumMap<K = any> extends Map<K, number> implements NumMapInterface {
+import { NumMapInterface } from "@/misc/interfaces";
+// @staticImplements<NumMapStatic>()
+export default class NumMap<K = any> extends Map<K, number> implements NumMapInterface<K> {
   /**
    * 증가
    * @param key
@@ -92,7 +94,7 @@ export default class NumMap<K = any> extends Map<K, number> implements NumMapInt
    * @param least 키값이 가져야할 최솟값
    * @returns 키 목록
    */
-  keysWithMaximum(least: number = 1): K[] {
+  getKeysWithMaximum(least: number = 1): K[] {
     const arrStack = []; // keys
     let maximum = 0;
 
@@ -119,8 +121,26 @@ export default class NumMap<K = any> extends Map<K, number> implements NumMapInt
    * 모든 값이 사건의 수일 때 일어날 수 있는 '경우의 가짓수'
    * @returns 경우의 수
    */
-  numberOfCase() {
+  getNumberOfCase(): number {
     return [...this.values()].reduce((acc, val) => acc * (val + 1), 1);
+  }
+
+  /**
+   * 문자열 숫자인 키와 키의 개수를 이용하여 만들 수 있는 가장 큰 정수를 리턴
+   * @param map
+   */
+  makeMaximum(map: Map<string, number> = this as Map<string, number>): number {
+    if (map.size) {
+      if ([...map.keys()].findIndex((e) => e !== "0") === -1) return 0;
+      return parseInt(
+        [...map]
+          .sort((a, b) => +b[0] - +a[0])
+          .map(([k, v]) => k.repeat(v))
+          .join("")
+      );
+    } else {
+      return -1;
+    }
   }
 
   /**

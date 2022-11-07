@@ -1,3 +1,14 @@
+export interface NumMapInterface<K> {
+  increase: (key: K, value: number) => Map<K, number>;
+  decrease: (key: K, value: number) => Map<K, number>;
+  add: (...keys: K[]) => number;
+  subtract: (...keys: K[]) => number;
+  findSpareKey: (arr: K[]) => K | undefined;
+  requestInScope: (elements: K[], scopes: number) => number;
+  getKeysWithMaximum: (least: number) => K[];
+  getNumberOfCase: () => number;
+}
+
 export interface AdjacencyListGraphNodeInterface<T> {
   data: T;
   adjacencyList: Set<AdjacencyListGraphNodeInterface<T>>;
