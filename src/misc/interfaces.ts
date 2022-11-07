@@ -8,9 +8,12 @@ export interface AdjacencyListGraphNodeInterface<T> {
 
 export interface AdjacencyListGraphInterface<T> {
   add: (obj: T) => void;
+  remove: (obj: T) => void;
   connect: (obj1: T, obj2: T) => void;
+  connectTo: (list: [T, T][]) => void;
   connectAll: () => void;
   disconnect: (obj1: T, obj2: T) => void;
   searchDepthFirst: (validator?: (data: T, ...args: any[]) => boolean) => { height: number };
   searchBreadthFirst: (root: T) => { n: number; height: number };
+  separateGraphAndGetNumberOfNodes?: (list: [T, T][]) => [number, number][];
 }

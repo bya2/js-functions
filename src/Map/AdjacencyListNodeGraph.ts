@@ -46,6 +46,19 @@ export default class AdjacencyListNodeGraph<D extends object = any>
   }
 
   /**
+   * 인접 리스트 그래프 노드 제거(연결된 노드들에 매핑되는 각 리스트에서 노드를 제거하고, 인접 리스트의 키에 해당하는 노드를 제거)
+   * @param node
+   */
+  remove(node: Node<D>): void {
+    if (this.has(node)) {
+      for (let adj of this.get(node)!) this.get(adj)!.delete(node);
+      this.delete(node);
+    } else {
+      console.warn(WARN_NoSuchNodeExist);
+    }
+  }
+
+  /**
    * 인접 리스트 그래프의 노드 간 간선 추가(인접 리스트의 키에 매핑되는 리스트에 노드를 추가)
    * @param node1
    * @param node2
@@ -56,6 +69,16 @@ export default class AdjacencyListNodeGraph<D extends object = any>
       this.get(node2)!.add(node1);
     } else {
       console.warn(WARN_NoSuchNodeExist);
+    }
+  }
+
+  /**
+   * 인접 리스트 그래프의 노드들 간 간선 추가
+   * @param list
+   */
+  connectTo(list: [Node<D>, Node<D>][]): void {
+    for (const [obj1, obj2] of list) {
+      this.connect(obj1, obj2);
     }
   }
 

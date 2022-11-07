@@ -15,6 +15,19 @@ class AdjacencyListGraph<T = any> extends Map<T, Set<T>> implements AdjacencyLis
   }
 
   /**
+   * 인접 리스트 그래프 노드 제거(연결된 노드들에 매핑되는 각 리스트에서 노드를 제거하고, 인접 리스트의 키에 해당하는 노드를 제거)
+   * @param obj
+   */
+  remove(obj: T): void {
+    if (this.has(obj)) {
+      for (let adj of this.get(obj)!) this.get(adj)!.delete(obj);
+      this.delete(obj);
+    } else {
+      console.warn(WARN_NoSuchNodeExist);
+    }
+  }
+
+  /**
    * 인접 리스트 그래프의 노드 간 간선 추가(인접 리스트의 키에 매핑되는 리스트에 노드를 추가)
    * @param obj1
    * @param obj2
@@ -25,6 +38,16 @@ class AdjacencyListGraph<T = any> extends Map<T, Set<T>> implements AdjacencyLis
       this.get(obj2)!.add(obj1);
     } else {
       console.warn(WARN_NoSuchNodeExist);
+    }
+  }
+
+  /**
+   * 인접 리스트 그래프의 노드들 간 간선 추가
+   * @param list
+   */
+  connectTo(list: [T, T][]): void {
+    for (const [obj1, obj2] of list) {
+      this.connect(obj1, obj2);
     }
   }
 
@@ -114,6 +137,20 @@ class AdjacencyListGraph<T = any> extends Map<T, Set<T>> implements AdjacencyLis
       n,
       height: depth,
     };
+  }
+
+  /**
+   * 간선을 제거하여 분리된 각 그래프의 정점의 개수 목록을 리턴
+   * @param list
+   */
+  separateGraphAndGetNumberOfNodes(list: [T, T][]): [number, number][] {
+    return list.map(([obj1, obj2]) => {
+      this.disconnect(obj1, obj2);
+      const { n: a } = this.searchBreadthFirst(obj1);
+      const { n: b } = this.searchBreadthFirst(obj2);
+      this.connect(obj1, obj2);
+      return [a, b];
+    });
   }
 }
 
