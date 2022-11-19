@@ -13,7 +13,7 @@ export default class Divisor {
    */
   static setOf(_number: number): Set<number> {
     const set = new Set<number>();
-    for (let i = 1, len = _number / 2; i < len; ++i) if (_number % i === 0) set.add(i);
+    for (let i = 1, len = _number / 2; i <= len; ++i) if (_number % i === 0) set.add(i);
     set.add(_number);
     return set;
   }
