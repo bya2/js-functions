@@ -17,9 +17,7 @@
   },
   "homepage": "https://github.com/bya2/js-functions#readme",
   "packageManager": "yarn@3.2.4",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "typings": "lib/index.d.ts",
+  "main": "src/index.ts",
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watchAll",
