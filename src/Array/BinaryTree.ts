@@ -1,35 +1,49 @@
-import Arr from "./Arr";
+import ArrayList from "./List";
 
-export default class BinaryTree extends Arr {
-  static indexOfRoot(): 1 {
+export default class BinaryTree<E = any> extends ArrayList<E> {
+  /**
+   * 이진 트리의 루트 요소 반환
+   */
+  get root(): E {
+    return this[1];
+  }
+
+  /**
+   * 루트 인덱스 반환
+   */
+  static rootIndex(): 1 {
     return 1;
   }
 
   /**
-   * @param _indexOfChild 자식 노드의 인덱스
+   * 상위 노드의 인덱스 반환
+   * @param childIndex
    */
-  static indexOfParent(_indexOfChild: number): number {
-    return _indexOfChild >> 1;
+  static parentIndex(childIndex: number): number {
+    return childIndex >> 1;
   }
 
   /**
-   * @param _indexOfParent 부모 노드의 인덱스
+   * 하위 노드의 왼쪽 인덱스 반환
+   * @param parentIndex
    */
-  static indexOfLeftChild(_indexOfParent: number): number {
-    return _indexOfParent * 2;
+  static leftChildIndex(parentIndex: number): number {
+    return parentIndex * 2;
   }
 
   /**
-   * @param _indexOfParent 부모 노드의 인덱스
+   * 하위 노드의 오른쪽 인덱스 반환
+   * @param parentIndex
    */
-  static indexOfRightChild(_indexOfParent: number): number {
-    return _indexOfParent * 2 + 1;
+  static rightChildIndex(parentIndex: number): number {
+    return parentIndex * 2 + 1;
   }
 
   /**
-   * @param _indexOfParent 부모 노드의 인덱스
+   * 하위 노드의 인덱스 목록을 배열로 반환
+   * @param parentIndex
    */
-  static indexesOfChildren(_indexOfParent: number): [number, number] {
-    return [_indexOfParent * 2, _indexOfParent * 2 + 1];
+  static childrenIndexes(parentIndex: number): [number, number] {
+    return [parentIndex * 2, parentIndex * 2 + 1];
   }
 }
