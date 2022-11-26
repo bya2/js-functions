@@ -17,7 +17,7 @@ const config: Configuration = {
     path: DIST,
     library: "js-functions",
     libraryTarget: "umd",
-    filename: "js-functions.js",
+    filename: "index.js",
     globalObject: "this",
     clean: true,
   },
