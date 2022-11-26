@@ -2,16 +2,16 @@ import { Length0, InvalidConstant } from "@/misc/messages";
 
 class ArrayList<E = any> extends Array<E> {
   // 방향 상수
-  static LEFT = 101;
-  static RIGHT = 102;
+  static readonly LEFT = 101;
+  static readonly RIGHT = 102;
 
   // 정렬 방향 상수
-  static ASC = 1;
-  static DESC = 2;
+  static readonly ASC = 1;
+  static readonly DESC = 2;
 
   // 정렬 기준 상수
-  static VALUE = 11;
-  static LENGTH = 12;
+  static readonly VALUE = 11;
+  static readonly LENGTH = 12;
 
   /**
    * 두 배열 요소들의 합집합을 배열로 반환.
