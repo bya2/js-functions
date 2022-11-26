@@ -7,7 +7,7 @@ class ArrayHeap<E = any> extends BTree<E> implements IHeap<E> {
   /**
    * @param comparator 우선 순위 비교 함수
    */
-  constructor(comparator: (a: E, b: E) => boolean) {
+  constructor(comparator?: (a: E, b: E) => boolean) {
     super();
     this.#compare = comparator || ((a: E, b: E) => a > b);
   }
