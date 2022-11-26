@@ -10,7 +10,10 @@
 !.yarn/cache
 #.pnp.*
 
-lib/
+# lib/
 cmd/
 
 coverage
+
+test.js
+test.ts

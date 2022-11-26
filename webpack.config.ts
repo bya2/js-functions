@@ -1,5 +1,5 @@
-import type { Configuration } from "webpack/types";
 import path from "path";
+import type { Configuration } from "webpack/types";
 
 const getRelPath = (...paths: string[]) => path.resolve(__dirname, ...paths);
 const SRC = getRelPath("src");
@@ -15,11 +15,11 @@ const config: Configuration = {
 
   output: {
     path: DIST,
-    library: "index",
+    library: "js-functions",
     libraryTarget: "umd",
-    filename: "index.js",
-    clean: true,
+    filename: "js-functions.js",
     globalObject: "this",
+    clean: true,
   },
 
   resolve: {
