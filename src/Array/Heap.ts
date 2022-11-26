@@ -1,94 +1,75 @@
-import BinaryTree from "./BinaryTree";
+import BTree from "@/Array/BinaryTree";
+import type { IHeap } from "@/misc/interfaces";
 
-interface HeapInterface<T> {
-  insert: (node: any) => void;
-  poll: () => T | null;
-}
-
-type CompareFunctionType<T> = (a: T, b: T) => boolean;
-
-export default class Heap<T = number> extends BinaryTree implements HeapInterface<T> {
-  private comparator: CompareFunctionType<T>;
+class ArrayHeap<E = any> extends BTree<E> implements IHeap<E> {
+  #compare: (a: E, b: E) => boolean;
 
   /**
-   * 힙 인스턴스 생성
-   * @param _comparator 우선 순위 비교 함수
+   * @param comparator 우선 순위 비교 함수
    */
-  constructor(_comparator: (a: T, b: T) => boolean) {
+  constructor(comparator: (a: E, b: E) => boolean) {
     super();
-    this.push(Infinity);
-    this.comparator = _comparator || ((a: T, b: T) => a > b); // MAX HEAP
+    this.#compare = comparator || ((a: E, b: E) => a > b);
   }
 
   /**
-   * 부모 노드의 두 자식 노드 중 우선 순위가 되는 노드의 인덱스를 반환
-   * @param _idxOfP
-   * @returns Index
+   * 부모 노드의 두 자식 노드 중 우선 순위가 되는 노드의 인덱스를 반환.
+   * @param parentIndex
    */
-  private getPriorIndexOfChild(_idxOfP: number): number {
-    const [idxOfLC, idxOfRC] = Heap.indexesOfChildren(_idxOfP);
-    return this.has(idxOfRC) && this.comparator(this[idxOfRC], this[idxOfLC]) ? idxOfRC : idxOfLC;
+  #getPriorChildIndex(parentIndex: number): number {
+    const [leftChildIndex, rightChildIndex] = BTree.childrenIndexesOf(parentIndex);
+    return this.has(rightChildIndex) && this.#compare(this[rightChildIndex], this[leftChildIndex])
+      ? rightChildIndex
+      : leftChildIndex;
   }
 
   /**
-   * 현재 노드와 부모 노드를 비교해서 우선 순위에 따라 노드 위치를 뒤바꾸기
+   * 현재 노드와 부모 노드를 비교해서 우선 순위에 따라 노드 위치를 교환.
    */
-  private heapifyUp(): void {
+  protected _heapifyUp(): void {
     for (
-      let idxOfCurr = this.length - 1, idxOfP = Heap.indexOfParent(idxOfCurr);
-      idxOfCurr >= 2 && this.comparator(this[idxOfCurr], this[idxOfP]);
-      idxOfCurr = idxOfP, idxOfP = Heap.indexOfParent(idxOfCurr)
+      let currentIndex = this.length - 1, parentIndex = BTree.parentIndexOf(currentIndex);
+      currentIndex >= 1 && this.#compare(this[currentIndex], this[parentIndex]);
+      currentIndex = parentIndex, parentIndex = BTree.parentIndexOf(currentIndex)
     ) {
-      this.swap(idxOfCurr, idxOfP);
+      this.swap(currentIndex, parentIndex);
     }
   }
 
   /**
-   * 루트 노드부터 자식 노드와 비교하여 우선 순위에 따라 정렬될 때까지 노드 위치를 뒤바꾸기를 반복
+   * 루트 노드부터 자식 노드와 비교하여 우선 순위에 따라 정렬될 때까지 노드 위치를 지속해서 교환.
    */
-  private heapifyDown(): void {
+  protected _heapifyDown(): void {
     for (
-      let idxOfCurr = 1, idxOfC = this.getPriorIndexOfChild(idxOfCurr);
-      this.comparator(this[idxOfC], this[idxOfCurr]);
-      idxOfCurr = idxOfC, idxOfC = this.getPriorIndexOfChild(idxOfCurr)
+      let currentIndex = 0, childIndex = this.#getPriorChildIndex(currentIndex);
+      this.#compare(this[childIndex], this[currentIndex]);
+      currentIndex = childIndex, childIndex = this.#getPriorChildIndex(currentIndex)
     ) {
-      this.swap(idxOfCurr, idxOfC);
+      this.swap(currentIndex, childIndex);
     }
   }
 
   /**
-   * 노드 삽입
-   * @param _node 삽입할 데이터
+   * 노드 삽입 및 우선 순위로 정렬.
+   * @param node 삽입할 데이터
    */
-  public insert(_node: any): void {
-    this.push(_node);
-    if (this.length >= 3) this.heapifyUp();
+  insert(node: E): void {
+    this.push(node);
+    if (this.length >= 2) this._heapifyUp();
   }
 
   /**
-   * 가장 우선 순위인 루트 노드를 추출
-   * @returns Root
+   * 가장 우선 순위인 루트 노드를 추출해서 반환.
    */
-  public poll(): T | null {
-    if (this.length <= 1) return null;
-    else if (this.length === 2) return this.pop();
+  poll(): E | undefined {
+    if (this.length <= 1) return this.pop();
     else {
-      [this[0], this[1]] = [this[1], this.pop()];
-      this.heapifyDown();
-      return this[0];
+      let tmp;
+      [tmp, this[0]] = [this[0], this.pop()!];
+      this._heapifyDown();
+      return tmp;
     }
   }
 }
 
-export class PriorityQueue extends Heap<number> {
-  get front() {
-    return this[1];
-  }
-
-  get rear() {
-    return this[this.length - 1];
-  }
-
-  enqueue = this.insert;
-  dequeue = this.poll;
-}
+export default ArrayHeap;
