@@ -28,3 +28,8 @@ export interface AdjacencyListGraphInterface<T> {
   searchBreadthFirst: (root: T) => { n: number; height: number };
   separateGraphAndGetNumberOfNodes?: (list: [T, T][]) => [number, number][];
 }
+
+export interface IHeap<E> {
+  insert: (node: E) => void;
+  poll: () => E | undefined;
+}
