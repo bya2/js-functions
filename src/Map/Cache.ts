@@ -26,7 +26,7 @@ export default class Cache<K, V> extends Map<K, V> {
     const cache = new this<number, number>();
 
     const fac = cache.memoize((value: number) => {
-      if (value === 1) return 1;
+      if (value <= 1) return 1;
       return value * fac(value - 1);
     });
 
