@@ -12,18 +12,18 @@ export default class CharArr extends Array<string> {
      * @param acc 누적되는 문자 리스트
      * @param index 검색할 문자의 시작 인덱스
      */
-    const searchDepthFirst = (acc: string[], index: number): void => {
+    const recur = (acc: string[] = [], index: number = 0): void => {
       if (acc.length === length) {
         combinations.push(acc.join(""));
         return;
       }
 
       for (let i = index, len = this.length; i < len; ++i) {
-        searchDepthFirst([...acc, this[i]], i + 1);
+        recur([...acc, this[i]], i + 1);
       }
     };
 
-    searchDepthFirst([], 0);
+    recur();
     return combinations;
   }
 
@@ -39,7 +39,7 @@ export default class CharArr extends Array<string> {
      * @param acc 누적되는 문자 리스트
      * @param dict 탐색 여부 해시
      */
-    const searchDepthFirst = (acc: string[] = [], dict: Dict<boolean>): void => {
+    const recur = (acc: string[] = [], dict: Dict<boolean> = { ...visited }): void => {
       if (acc.length === length) {
         combinations.push(acc.join(""));
         return;
@@ -47,12 +47,12 @@ export default class CharArr extends Array<string> {
 
       for (const char of this) {
         if (!dict[char]) {
-          searchDepthFirst([...acc, char], { ...dict, [char]: true });
+          recur([...acc, char], { ...dict, [char]: true });
         }
       }
     };
 
-    searchDepthFirst([], { ...visited });
+    recur();
     return combinations;
   }
 }
