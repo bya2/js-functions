@@ -1,5 +1,18 @@
 export default class Word extends String {
   /**
+   * 단어가 거꾸로 해도 맞는지 확인
+   * @param word
+   */
+  static isPalindrome(word: string): boolean {
+    const recur = (l: number, r: number): boolean => {
+      if (l >= r) return true;
+      else if (word[l] !== word[r]) return false;
+      else return recur(l + 1, r - 1);
+    };
+    return recur(0, word.length - 1);
+  }
+
+  /**
    * 단어의 첫글자 대문자화
    * @returns Capital
    */
