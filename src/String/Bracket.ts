@@ -13,8 +13,10 @@ export default class Bracket extends String {
   ) {
     const stack: string[] = [];
     for (let i = 0, len = this.length; i < len; ++i) {
-      if (typeof _pairs === "undefined") {
-        stack.push(_pairs[this[i]]);
+      // if (typeof _pairs === "undefined") {
+      //   stack.push(_pairs[this[i]]);
+      if (typeof _pairs[this[i]] === "undefined") {
+        stack.push(this[i]);
       } else {
         if (stack[stack.length - 1] !== _pairs[this[i]]) return false;
         stack.pop();
