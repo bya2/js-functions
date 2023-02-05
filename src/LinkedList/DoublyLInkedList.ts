@@ -1,224 +1,68 @@
-interface NodeInterface<D> {
-  data: D;
-  prev: NodeInterface<D> | null;
-  next: NodeInterface<D> | null;
-}
-
-export class Node<D = any> implements NodeInterface<D> {
+class Node<D = any> {
   data;
-  prev;
-  next;
+  prev: Node<D> | null;
+  next: Node<D> | null;
 
-  constructor(data: D, prev?: NodeInterface<D>, next?: NodeInterface<D>) {
+  constructor(data: D, prev?: Node<D>, next?: Node<D>) {
     this.data = data;
     this.prev = prev || null;
     this.next = next || null;
   }
 }
 
-const IndenOutOfBoundsEnception = "";
-// const NoSuchElementEnception = "";
+interface DoublyLinkedListInterface<E> {
+  get(index: number): E;
+  set(index: number, data: E): void;
+  isEmpty(): boolean;
+  contain(data: E): boolean;
+  search(data: E): Node<E> | null;
+  searchIndexOf(data: E): number;
+  searchBy(index: number): Node<E> | null;
+  unshift(data: E): void;
+  push(data: E): void;
+  insert(data: E, index: number): boolean;
+  shift(): E | null;
+  pop(): E | null;
+  popAt(index: number): E | null;
+  filter(callback: Function): DoublyLinkedList<E>;
+  clear(): void;
+  copy(): DoublyLinkedList<E>;
+  sort(comparator?: (a: E, b: E) => number): void;
+}
 
-const isEqual = (a: any, b: any): boolean => {
-  return JSON.stringify(a) === JSON.stringify(b);
-};
+class DoublyLinkedList<E = any> implements DoublyLinkedListInterface<E> {
+  head: Node<E> | null = null;
+  tail: Node<E> | null = null;
+  length: number = 0;
 
-interface DoublyLinkedListInterface<E> {}
-
-export default class DoublyLinkedList<E = any> implements DoublyLinkedListInterface<E> {
-  head: NodeInterface<E> | null = null;
-  tail: NodeInterface<E> | null = null;
-  size: number = 0;
-
-  constructor(head?: NodeInterface<E>) {
+  constructor(head?: Node<E>) {
     if (typeof head !== "undefined") {
       this.head = head;
       this.tail = head;
-      this.size = 1;
+      this.length = 1;
     }
   }
 
-  /**
-   * 인덱스에 대응하는 위치의 노드를 반환
-   * @param index
-   */
-  search(index: number): Node<E> {
-    if (index < 0 || index >= this.size) throw new Error(IndenOutOfBoundsEnception);
-
-    let node = this.head!;
-    for (let i = 0; i < index; ++i) node = node.next!;
-    return node;
-  }
-
-  /**
-   * Head에 노드 추가
-   * @param data
-   */
-  addFirst(data: E): void {
-    const node = new Node<E>(data);
-    if (this.size === 0) {
-      this.head = node;
-      this.tail = node;
-    } else {
-      node.next = this.head;
-      this.head!.prev = node;
-      this.head = node;
-    }
-    this.size++;
-  }
-
-  /**
-   * Tail에 노드 추가
-   * @param data
-   */
-  addLast(data: E): void {
-    const node = new Node<E>(data);
-    if (this.size === 0) {
-      this.head = node;
-      this.tail = node;
-    } else {
-      node.prev = this.tail;
-      this.tail!.next = node;
-      this.tail = node;
-    }
-    this.size++;
-  }
-
-  /**
-   * 인덱스에 대응하는 위치에 노드 추가
-   * @param index
-   * @param data
-   * @returns
-   */
-  add(index: number, data: E): void {
-    if (index < 0 || index > this.size) throw new Error(IndenOutOfBoundsEnception);
-
-    if (index === 0) {
-      this.addFirst(data);
-      return;
-    }
-
-    if (index === this.size) {
-      this.addLast(data);
-      return;
-    }
-
-    const prev = this.search(index - 1);
-    const next = prev.next;
-    const curr = new Node<E>(data);
-
-    prev.next = null;
-    prev.next = curr;
-    curr.next = next;
-
-    this.size++;
-  }
-
-  /**
-   * 리스트의 Head을 추출하고 반환
-   */
-  pollFirst(): E | null {
-    if (this.size === 0) return null;
-
-    const data = this.head!.data;
-
-    if (this.size === 1) {
-      this.head = null;
-      this.tail = null;
-    } else {
-      this.head = this.head!.next;
-      this.head!.prev = null;
-    }
-
-    this.size--;
-
-    return data;
-  }
-
-  /**
-   * 리스트의 Tail을 추출하고 반환
-   */
-  pollLast(): E | null {
-    if (this.size === 0) return null;
-
-    const data = this.tail!.data;
-
-    if (this.size === 1) {
-      this.head = null;
-      this.tail = null;
-    } else {
-      this.tail = this.tail!.prev;
-      this.tail!.next = null;
-    }
-
-    return data;
-  }
-
-  /**
-   * 인덱스에 대응하는 위치의 노드를 추출해서 반환. 없으면 null을 반환
-   * @param index
-   * @returns
-   */
-  pollAt(index: number): E | null {
-    if (index < 0 || index >= this.size) throw new Error(IndenOutOfBoundsEnception);
-
-    if (index === 0) {
-      return this.pollFirst();
-    }
-
-    if (index === this.size - 1) {
-      return this.pollLast();
-    }
-
-    const prev = this.search(index - 1);
-    const curr = prev.next!;
-    const data = curr.data;
-    const next = curr.next;
-
-    prev.next = null;
-    prev.next = next;
-    curr.next = null;
-    this.size--;
-
-    return data;
-  }
-
-  findBy(data: E) {}
-
-  /**
-   * 데이터에 해당하는 노드 중
-   * @param data
-   */
-  removeBy(data: E) {
-    if (this.size === 0) return;
-
-    const curr = this.head;
-
-    if (curr === null) {
-      return;
-    }
-
-    if (curr.data === data) {
-      //
+  *[Symbol.iterator]() {
+    let current = this.head;
+    while (current) {
+      yield current.data;
+      current = current.next;
     }
   }
 
   get(index: number): E {
-    return this.search(index).data;
+    return this.searchBy(index)!.data;
   }
 
   set(index: number, data: E): void {
-    const node = this.search(index);
-    node.data = data;
+    this.searchBy(index)!.data = data;
   }
-
-  indexOf(data: E): number {
-    for (let node = this.head, index = 0; node !== null; node = node.next, ++index) {
-      if (isEqual(data, node.data)) {
-        return index;
-      }
-    }
-    return -1;
+  /**
+   * 리스트의 크기가 0인지 여부를 반환
+   */
+  isEmpty(): boolean {
+    return this.length === 0;
   }
 
   /**
@@ -226,60 +70,226 @@ export default class DoublyLinkedList<E = any> implements DoublyLinkedListInterf
    * @param data
    */
   contain(data: E): boolean {
-    return this.indexOf(data) >= 0;
+    return this.searchIndexOf(data) >= 0;
   }
 
   /**
-   * 리스트의 크기가 0인지 여부를 반환
+   * 데이터에 해당하는 노드를 반환
+   * @param data
    */
-  isEmpty(): boolean {
-    return this.size === 0;
+  search(data: E): Node<E> | null {
+    for (let current = this.head; current !== null; current = current.next) {
+      if (current.data === data) {
+        return current;
+      }
+    }
+    return null;
   }
 
   /**
-   * 리스트의 모든 노드 제거
+   * 데이터에 해당하는 노드의 인덱스를 반환
+   * @param data
+   */
+  searchIndexOf(data: E): number {
+    for (let current = this.head, index = 0; current !== null; current = current.next, ++index) {
+      if (current.data === data) {
+        return index;
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * 인덱스에 대응하는 위치의 노드를 반환
+   * @param index
+   */
+  searchBy(index: number): Node<E> | null {
+    if (index < 0 || index >= this.length) return null;
+
+    let current: Node<E>;
+    if (index <= this.length / 2) {
+      current = this.head!;
+      for (let i = 0; i < index; ++i) {
+        current = current.next!;
+      }
+    } else {
+      current = this.tail!;
+      for (let i = this.length - 1; i > index; --i) {
+        current = current.prev!;
+      }
+    }
+
+    return current;
+  }
+
+  /**
+   * Head에 노드 추가
+   * @param data
+   */
+  unshift(data: E): void {
+    const node = new Node<E>(data);
+    if (this.head === null) {
+      this.head = node;
+      this.tail = node;
+    } else {
+      this.head.prev = node;
+      node.next = this.head;
+      this.head = node;
+    }
+    this.length++;
+  }
+
+  /**
+   * Tail에 노드 추가
+   * @param data
+   */
+  push(data: E): void {
+    const node = new Node<E>(data);
+    if (this.length === 0) {
+      this.head = node;
+      this.tail = node;
+    } else {
+      node.prev = this.tail;
+      this.tail!.next = node;
+      this.tail = node;
+    }
+    this.length++;
+  }
+
+  /**
+   * 인덱스에 대응하는 위치에 노드 추가
+   * @param index
+   * @param data
+   * @returns isSuccess
+   */
+  insert(data: E, index: number = this.length): boolean {
+    if (index < 0 || index > this.length) return false;
+
+    if (index === 0) {
+      this.unshift(data);
+      return true;
+    }
+
+    if (index === this.length) {
+      this.push(data);
+      return true;
+    }
+
+    const newNode = new Node(data);
+    const prevNode = this.searchBy(index - 1)!;
+    const nextNode = prevNode.next!;
+    prevNode.next = newNode;
+    newNode.prev = prevNode;
+    newNode.next = nextNode;
+    nextNode.prev = newNode;
+    this.length++;
+
+    return true;
+  }
+
+  /**
+   * 리스트의 Head을 추출하고 반환
+   */
+  shift(): E | null {
+    if (this.length === 0) return null;
+
+    const data = this.head!.data;
+
+    if (this.length === 1) {
+      this.head = null;
+      this.tail = null;
+    } else {
+      this.head = this.head!.next;
+      this.head!.prev = null;
+    }
+
+    this.length--;
+
+    return data;
+  }
+
+  /**
+   * 리스트의 Tail을 추출하고 반환
+   */
+  pop(): E | null {
+    if (this.head === null) return null;
+
+    const node = this.tail!;
+    if (this.head === this.tail) {
+      this.head = null;
+      this.tail = null;
+    } else {
+      this.tail = node.prev;
+      this.tail!.next = null;
+    }
+    this.length--;
+
+    return node.data;
+  }
+
+  /**
+   * 인덱스에 대응하는 위치의 노드를 추출해서 반환. 없으면 null을 반환
+   * @param index
+   */
+  popAt(index: number): E | null {
+    if (index < 0 || index >= this.length) return null;
+    if (index === 0) return this.shift();
+    if (index === this.length - 1) return this.pop();
+
+    const node = this.searchBy(index)!;
+    node.prev!.next = node.next;
+    node.next!.prev = node.prev;
+    this.length--;
+
+    return node.data;
+  }
+
+  /**
+   * 콜백함수에 대해 필터링해서 반환
+   * @param callback
+   */
+  filter(callback: Function): DoublyLinkedList<E> {
+    let current = this.head!;
+    let filteredList = new DoublyLinkedList();
+    for (let i = 0; i < this.length; ++i) {
+      if (callback(current.data, i, this)) {
+        filteredList.push(current.data);
+      }
+      current = current.next!;
+    }
+    return filteredList;
+  }
+
+  /**
+   * 모든 노드 제거
+   * 나머지는 가비지 컬렉션
    */
   clear(): void {
-    for (let node = this.head; node !== null; ) {
-      const nextNode = node.next;
-      // node.data = null; // garbage
-      node.next = null;
-      node = nextNode;
-    }
     this.head = null;
     this.tail = null;
-    this.size = 0;
+    this.length = 0;
   }
 
   /**
    * 리스트 깊은 복사
    * @returns new DoublyLinkedList
    */
-  clone() {
-    const clone = new DoublyLinkedList<E>();
-    for (let node = this.head; node !== null; node = node.next) clone.addLast(node.data);
-    return clone;
-  }
-
-  /**
-   * 배열로 전환
-   * @returns Array
-   */
-  toArray() {
-    const arr = [];
-    for (let [i, node] = [0, this.head]; node !== null; ++i, node = node.next) arr[i] = node.data;
-    return arr;
+  copy() {
+    const copiedList = new DoublyLinkedList<E>();
+    for (let node = this.head; node !== null; node = node.next) copiedList.push(node.data);
+    return copiedList;
   }
 
   /**
    * 정렬
    * @param comparator 비교 함수
    */
-  sort(comparator: (a: E, b: E) => number): void {
-    const arr = this.toArray();
-    arr.sort(comparator);
-    for (let [i, node] = [0, this.head]; node !== null; ++i) {
-      node.data = arr[i];
-    }
+  sort(comparator?: (a: E, b: E) => number): void {
+    const values = [...this];
+    values.sort(comparator);
+    this.clear();
+    for (const value of values) this.push(value);
   }
 }
+
+export default DoublyLinkedList;
