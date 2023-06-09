@@ -15,3 +15,16 @@ export default class Stack<T = any> extends Arr<T> {
     return -1;
   }
 }
+
+const examples = {
+  배열_내_연속된_중복_숫자_제거: (arr: number[]) => {
+    const STACK = new Stack();
+    STACK.push(arr[0]);
+    for (let i = 1; i < arr.length; ++i) {
+      if (STACK.peek !== arr[i]) {
+        STACK.push(arr[i]);
+      }
+    }
+    return STACK;
+  },
+};
