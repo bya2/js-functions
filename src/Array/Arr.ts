@@ -76,6 +76,10 @@ export default class Arr<T = any> extends Array<T> {
     [this[_index1], this[_index2]] = [this[_index2], this[_index1]];
   }
 
+  clear(): void {
+    this.length = 0;
+  }
+
   /**
    * 같은 데이터를 가진 요소들 중 (_value - 1)개씩 필터링
    * @param _value 남길 요소의 갯수
