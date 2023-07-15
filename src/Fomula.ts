@@ -1,3 +1,15 @@
+export const factorial = (value: number): number => {
+  let n = 1;
+  for (let i = 2; i <= value; ++i) n *= i;
+  return n;
+};
+
+export const fibonacci = (index: number, first: number = 0, second: number = 1): number => {
+  if (index === 0) return first;
+  if (index === 1) return second;
+  return fibonacci(index - 2) + fibonacci(index - 1);
+};
+
 /**
  * 하노이의 탑
  * (https://shoark7.github.io/programming/algorithm/tower-of-hanoi)
