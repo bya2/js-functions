@@ -29,3 +29,27 @@ export default class Divisor {
     return arr;
   }
 }
+
+export const get_divisor = (n: number): number[] => {
+  const _0 = 0;
+  const _1 = 1;
+  const _2 = 2;
+  let _n = n;
+  const v = [];
+
+  let count_divisors_2 = 0;
+
+  while ((_n & 1) === 0) {
+    v.push(_2 << count_divisors_2);
+    count_divisors_2++;
+    _n >>= 1;
+  }
+
+  const _x = 3;
+  // const
+  return [1];
+};
+
+// export function approximated_sqrt(n: number): number {
+//   let num_bits = ()
+// }
