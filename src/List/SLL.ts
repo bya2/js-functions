@@ -1,3 +1,5 @@
+const IndenOutOfBoundsEnception = "";
+
 export class Node<T> {
   _o: T;
   _next: Node<T> | null = null;
@@ -10,7 +12,7 @@ export class Node<T> {
     return this._o;
   }
 
-  get next(): Node<T> | null {
+  next(): Node<T> | null {
     return this._next || null;
   }
 }
@@ -46,5 +48,42 @@ export default class SLL<DT> {
       yield curr._o;
       curr = curr._next;
     }
+  }
+
+  _checkIndexOut(index: number): boolean {
+    return index < 0 || index >= this._capacity;
+  }
+
+  get(index: number): Node<DT> {
+    if (this._checkIndexOut(index)) throw new Error(IndenOutOfBoundsEnception);
+
+    let node = this._head!;
+    for (let i = 0; i < index; ++i) node = node._next!;
+    return node;
+  }
+
+  shift(data: DT) {
+    const tmp = new Node<DT>(data);
+    tmp._next = this._head;
+    this._head = tmp;
+
+    this._capacity++;
+
+    if (this._head._next === null) {
+      this._tail = this._head;
+    }
+  }
+
+  push(data: DT) {
+    if (this._capacity === 0) {
+      this.shift(data);
+      return;
+    }
+
+    const tmp = new Node<DT>(data);
+    this._tail = tmp;
+    this._tail._next = null;
+
+    this._capacity++;
   }
 }
