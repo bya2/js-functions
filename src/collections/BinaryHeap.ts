@@ -1,28 +1,23 @@
 interface ImplList<T> {
-  pop(): T;
+  pop(): T | undefined;
   push(item: T): void;
 }
 
-interface ImplBinaryHeap<T> {
+interface ImplArr<T> {}
+
+interface ImplBinaryHeap<T> extends ImplArr<T>, ImplList<T> {
   siftUp(): void;
-  siftDownRagne(): void;
   siftDown(): void;
+  swap(i: number, j: number): void;
+  compare(a: T, b: T): boolean;
+  compareChildren(i: number): number;
 }
 
-Object.defineProperties(Array.prototype, {
-  swap: {
-    value(i: number, j: number) {
-      const temp = this[i];
-      this[i] = this[j];
-      this[j] = temp;
-    },
-  },
-});
-
-class BinaryHeap<T> implements ImplList<T>, ImplBinaryHeap<T> {
+class BinaryHeap<T> implements ImplBinaryHeap<T> {
   _inner: T[];
 
-  constructor(initialData: T[] = []) {
+  constructor(compareFn: (a: T, b: T) => boolean, initialData: T[] = []) {
+    this.compare = compareFn;
     this._inner = initialData;
   }
 
@@ -30,34 +25,58 @@ class BinaryHeap<T> implements ImplList<T>, ImplBinaryHeap<T> {
     return this._inner.length;
   }
 
-  pop(): T {
-    throw new Error("Method not implemented.");
+  *[Symbol.iterator]() {
+    for (let i = 0; i < this._inner.length; ++i) {
+      yield this._inner[i];
+    }
+  }
+
+  pop(): T | undefined {
+    if (this._inner.length <= 1) return this._inner.pop();
+    const data = this._inner[0];
+    this._inner[0] = this.pop()!;
+    this.siftDown();
+    return data;
   }
 
   push(item: T): void {
-    const oldLen = this._inner.length;
     this._inner.push(item);
-    try {
-      this.siftUp();
-    } catch (err: any) {
-      throw new Error(err);
-    }
+    this.siftUp();
   }
 
   siftUp() {
     let i = this._inner.length - 1;
     let pi = (i - 1) >> 1;
 
-    while (i > 0) {
-      this._inner.swap(i, pi);
+    while (i > 0 && this.compare(this._inner[i], this._inner[pi])) {
+      this.swap(i, pi);
       i = pi;
       pi = (i - 1) >> 1;
     }
   }
-  siftDownRagne(): void {
-    throw new Error("Method not implemented.");
+
+  siftDown() {
+    let i = 0;
+    let ci = this.compareChildren(i);
+
+    while (ci < this._inner.length && this.compare(this._inner[ci], this._inner[i])) {
+      this.swap(i, ci);
+      i = ci;
+      ci = this.compareChildren(i);
+    }
   }
-  siftDown(): void {
-    throw new Error("Method not implemented.");
+
+  swap(i: number, j: number) {
+    [this._inner[i], this._inner[j]] = [this._inner[j], this._inner[i]];
+  }
+
+  compare: (a: T, b: T) => boolean;
+
+  compareChildren(i: number): number {
+    const li = i * 2 + 1;
+    const ri = li + 1;
+    return ri in this._inner && this.compare(this._inner[ri], this._inner[li]) ? ri : li;
   }
 }
+
+export default BinaryHeap;
