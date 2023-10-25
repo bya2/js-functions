@@ -1,0 +1,3 @@
+interface ImplVisitMap {
+  visit(): boolean;
+}

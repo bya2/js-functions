@@ -34,7 +34,7 @@ class BinaryHeap<T> implements ImplBinaryHeap<T> {
   pop(): T | undefined {
     if (this._inner.length <= 1) return this._inner.pop();
     const data = this._inner[0];
-    this._inner[0] = this.pop()!;
+    this._inner[0] = this._inner.pop()!;
     this.siftDown();
     return data;
   }
