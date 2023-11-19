@@ -16,7 +16,7 @@
     "url": "https://github.com/bya2/js-functions/issues"
   },
   "homepage": "https://github.com/bya2/js-functions#readme",
-  "packageManager": "yarn@3.2.4",
+  "packageManager": "yarn@4.0.2",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "typings": "lib/index.d.ts",
