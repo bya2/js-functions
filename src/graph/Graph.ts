@@ -25,6 +25,6 @@ export class Node<T = any, Id = string> {
   }
 }
 
-export default class Graph<N> implements implGraph {
-  _inner: Map<N>;
-}
+// export default class Graph<N> implements implGraph {
+//   _inner: Map<N>;
+// }
