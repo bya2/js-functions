@@ -1,41 +1,29 @@
 const IndenOutOfBoundsEnception = "";
 
 export class Node<T> {
-  _o: T;
-  _next: Node<T> | null = null;
+  _inner: T;
+  next: Node<T> | null = null;
 
   constructor(data: T) {
-    this._o = data;
+    this._inner = data;
   }
 
   get data() {
-    return this._o;
-  }
-
-  next(): Node<T> | null {
-    return this._next || null;
+    return this._inner;
   }
 }
 
-export default class SLL<DT> {
-  _head: Node<DT> | null = null;
-  _tail: Node<DT> | null = null;
+export default class SLL<T> {
+  head: Node<T> | null = null;
+  tail: Node<T> | null = null;
   _capacity: number = 0;
 
-  constructor(head?: Node<DT>) {
+  constructor(head?: Node<T>) {
     if (head) {
-      this._head = head;
-      this._tail = head;
+      this.head = head;
+      this.tail = head;
       this._capacity = 1;
     }
-  }
-
-  get head() {
-    return this._head;
-  }
-
-  get tail() {
-    return this._tail;
   }
 
   get capacity() {
@@ -43,10 +31,8 @@ export default class SLL<DT> {
   }
 
   *[Symbol.iterator]() {
-    let curr = this._head;
-    while (curr) {
-      yield curr._o;
-      curr = curr._next;
+    for (let node = this.head; node; node = node.next) {
+      yield node._inner;
     }
   }
 
@@ -54,35 +40,35 @@ export default class SLL<DT> {
     return index < 0 || index >= this._capacity;
   }
 
-  get(index: number): Node<DT> {
+  get(index: number): Node<T> {
     if (this._checkIndexOut(index)) throw new Error(IndenOutOfBoundsEnception);
 
-    let node = this._head!;
-    for (let i = 0; i < index; ++i) node = node._next!;
+    let node = this.head!;
+    for (let i = 0; i < index; ++i) node = node.next!;
     return node;
   }
 
-  shift(data: DT) {
-    const tmp = new Node<DT>(data);
-    tmp._next = this._head;
-    this._head = tmp;
+  shift(data: T) {
+    const tmp = new Node<T>(data);
+    tmp.next = this.head;
+    this.head = tmp;
 
     this._capacity++;
 
-    if (this._head._next === null) {
-      this._tail = this._head;
+    if (this.head.next === null) {
+      this.tail = this.head;
     }
   }
 
-  push(data: DT) {
+  push(data: T) {
     if (this._capacity === 0) {
       this.shift(data);
       return;
     }
 
-    const tmp = new Node<DT>(data);
-    this._tail = tmp;
-    this._tail._next = null;
+    const tmp = new Node<T>(data);
+    this.tail = tmp;
+    this.tail.next = null;
 
     this._capacity++;
   }

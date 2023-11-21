@@ -1,9 +1,7 @@
-
-
 class Node<T> {
   _inner: T;
-  prev: Node<T> | null = null;
-  next: Node<T> | null = null;
+  prev?: Node<T>;
+  next?: Node<T>;
 
   constructor(data: T) {
     this._inner = data;
@@ -14,57 +12,86 @@ class Node<T> {
   }
 }
 
-export default class DLL<T> implements List {
-  _head: Node<T> | null = null;
-  _tail: Node<T> | null = null;
-  _length: number = 0;
+interface ListStruct<N> {
+  head?: N;
+  tail?: N;
+  get length(): number;
+}
+
+interface ImplList<T> {
+  unshift(item: T): void;
+  shift(): T | undefined;
+  push(item: T): void;
+  pop(): T | undefined;
+}
+
+interface ImplLinkedList<T> {
+  at(index: number): T | undefined;
+  unshift(item: T): void;
+  shift(): T | undefined;
+  push(item: T): void;
+  pop(): T | undefined;
+  insert(data: T, index: number): boolean;
+  popAt(index: number): T | undefined;
+}
+
+interface ImplClone {
+  clone<CLS = any>(): ThisType<CLS>;
+}
+
+interface ImplPrint {
+  print(): void;
+}
+
+export default class DLL<T> implements ListStruct<Node<T>>, ImplLinkedList<T> {
+  head?: Node<T>;
+  tail?: Node<T>;
+  #len: number = 0;
 
   constructor(headData?: T) {
     if (headData) {
       const node = new Node(headData);
-      this._head = node;
-      this._tail = node;
-      this._length = 1;
+      this.head = node;
+      this.tail = node;
+      this.#len = 1;
     }
   }
-
-  get head() {
-    return this._head?._inner;
+  insert(data: T, index: number): boolean {
+    throw new Error("Method not implemented.");
   }
-
-  get tail() {
-    return this._tail?._inner;
+  popAt(index: number): T | undefined {
+    throw new Error("Method not implemented.");
   }
 
   get length() {
-    return this._length;
+    return this.#len;
   }
 
   *[Symbol.iterator]() {
-    for (let node = this._head; node; node = node.next) {
+    for (let node = this.head; node; node = node.next) {
       yield node._inner;
     }
   }
 
   at(index: number): T | undefined {
-    index = index >= 0 ? index : this._length + index;
+    index = index >= 0 ? index : this.#len + index;
 
-    if (index < 0 || index >= this._length) return undefined;
+    if (index < 0 || index >= this.#len) return;
 
     let node: Node<T>;
-    if (index <= this._length / 2) {
-      node = this._head!;
+    if (index <= this.#len / 2) {
+      node = this.head!;
       for (let i = 0; i < index; ++i) node = node.next!;
     } else {
-      node = this._tail!;
-      for (let i = this.length - 1; i > index; --i) node = node.prev!;
+      node = this.tail!;
+      for (let i = this.#len - 1; i > index; --i) node = node.prev!;
     }
 
     return node._inner;
   }
 
   find<S extends T>(predicate: (value: T, index: number) => value is S): S | undefined {
-    for (let node = this._head, i = 0; node; node = node.next, ++i) {
+    for (let node = this.head, i = 0; node; node = node.next, ++i) {
       if (predicate(node._inner, i)) {
         return node._inner;
       }
@@ -72,7 +99,85 @@ export default class DLL<T> implements List {
     return undefined;
   }
 
+  findIndex<S extends T>(predicate: (value: T, index: number) => value is S): number {
+    for (let node = this.head, i = 0; node; node = node.next, ++i) {
+      if (predicate(node._inner, i)) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   unshift(item: T) {
     const node = new Node(item);
+
+    if (this.head) {
+      this.head.prev = node;
+      node.next = this.head;
+      this.head = node;
+    } else {
+      this.tail = this.head = node;
+    }
+
+    this.#len++;
+  }
+
+  shift(): T | undefined {
+    if (!this.head) return undefined;
+
+    const w = this.head._inner;
+
+    if (this.#len === 1) {
+      this.tail = this.head = undefined;
+    } else {
+      this.head = this.head.next!;
+      this.head.prev = undefined;
+    }
+
+    this.#len--;
+
+    return w;
+  }
+
+  push(item: T) {
+    const node = new Node(item);
+
+    if (this.tail) {
+      node.prev = this.tail;
+      this.tail.next = node;
+      this.tail = node;
+    } else {
+      this.head = this.tail = node;
+    }
+
+    this.#len++;
+  }
+
+  pop(): T | undefined {
+    if (!this.tail) return undefined;
+
+    const w = this.tail._inner;
+
+    if (this.#len === 1) {
+      this.head = this.tail = undefined;
+    } else {
+      this.tail = this.tail.prev!;
+      this.tail.next = undefined;
+    }
+
+    this.#len--;
+
+    return w;
+  }
+
+  clear() {
+    for (let node = this.head; node; ) {
+      const tmp = node.next;
+      node.next = undefined;
+      node = tmp;
+    }
+
+    this.tail = this.head = undefined;
+    this.#len = 0;
   }
 }

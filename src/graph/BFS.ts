@@ -1,7 +1,7 @@
-import DLL from "@/List/DLL";
+// import DLL from "@/List/DLL";
 
-interface implBFS {}
+// interface implBFS {}
 
-export default class BFS<T> implements implBFS {
-  queue: DLL<T>;
-}
+// export default class BFS<N> implements implBFS {
+//   queue: DLL<T>;
+// }
