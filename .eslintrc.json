@@ -7,11 +7,7 @@
     "jest": true
   },
 
-  "extends": [
-    "eslint:recommended",
-    "plugin:import/recommended",
-    "plugin:@typescript-eslint/recommended"
-  ],
+  "extends": ["eslint:recommended", "plugin:import/recommended", "plugin:@typescript-eslint/recommended"],
 
   "overrides": [],
 
@@ -78,7 +74,7 @@
       }
     ],
 
-    "prettier/prettier": "error",
+    // "prettier/prettier": "warn",
 
     // Possible Problems
     "no-use-before-define": "off", // 변수 선언의 순서에 따라 사용에 제한을 두는 규칙
@@ -99,12 +95,5 @@
     "yield-star-spacing": ["error", "before"] // '제네레이터 함수 연산자'의 위치를 제한하는 규칙
   },
 
-  "ignorePatterns": [
-    "lib/",
-    "node_modules/",
-    ".yarn/",
-    ".pnp.cjs",
-    "src/**/*.d.ts",
-    "src/**/*.test.ts"
-  ]
+  "ignorePatterns": ["lib/", "node_modules/", ".yarn/", ".pnp.cjs", "src/**/*.d.ts", "src/**/*.test.ts"]
 }
