@@ -98,7 +98,7 @@
     "newLine": "lf" /* end of line sequence 설정(기본적으로 플랫폼에 따라 "crlf" (windows) or "lf" (unix) 가 설정) */
   },
   "files": ["./tsconfig.json"],
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/collections/LinkedList.test.js", "src/collections/LinkedList.test.js"],
   "exclude": [
     ".vscode",
     "node_modules",

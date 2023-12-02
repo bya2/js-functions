@@ -3,9 +3,7 @@ interface ImplList<T> {
   push(item: T): void;
 }
 
-interface ImplArr<T> {}
-
-interface ImplBinaryHeap<T> extends ImplArr<T>, ImplList<T> {
+interface ImplBinaryHeap<T> extends ImplList<T> {
   siftUp(): void;
   siftDown(): void;
   swap(i: number, j: number): void;
