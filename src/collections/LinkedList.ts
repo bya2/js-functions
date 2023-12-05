@@ -45,12 +45,17 @@ interface ImplList<T> {
 
   filter(predicate: (value: T, index: number, obj: LinkedList<T>) => unknown, thisArg?: any): LinkedList<T>;
 
+  map<U = any>(callbackfn: (value: T, index: number, obj: this) => U, thisArg?: any): LinkedList<U>;
+
   reduce(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, obj: this) => T): T;
   reduce(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, obj: this) => T, initialValue: T): T;
   reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, obj: this) => U, initialValue: U): U;
 
   clone(): LinkedList<T>;
+
   toArray(): T[];
+
+  print(): void;
 }
 
 export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
@@ -207,7 +212,7 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
     this.#len++;
   }
 
-  delete(node: Node<T>): void {
+  #delete(node: Node<T>): void {
     const px = node.prev!;
     const nx = node.next!;
 
@@ -227,7 +232,7 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
     if (index === this.#len - 1) return this.pop();
 
     const x = this.#nodeAt(index);
-    this.delete(x);
+    this.#delete(x);
 
     return x._inner;
   }
@@ -257,7 +262,7 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
   }
 
   every<S extends T>(predicate: (value: T, index: number, obj: this) => value is S, thisArg?: any): this is S[];
-  every(predicate: (value: T, index: number, array: T[]) => unknown, thisArg?: any): boolean;
+  every(predicate: (value: T, index: number, obj: this) => unknown, thisArg?: any): boolean;
   every(predicate: unknown, thisArg?: unknown): boolean {
     if (typeof predicate !== "function") throw new Error();
 
@@ -323,5 +328,13 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
     const s = [];
     for (let node = this.head; node; node = node.next) s.push(node._inner);
     return `[ ${s.join(" <=> ")} ]`;
+  }
+
+  map<U>(callbackfn: (value: T, index: number, obj: this) => U, thisArg?: any): LinkedList<U> {
+    const ins = new LinkedList<U>();
+    for (let node = this.head, i = 0; node; node = node.next, ++i) {
+      ins.push(callbackfn.call(thisArg, node._inner, i, this));
+    }
+    return ins;
   }
 }
