@@ -31,3 +31,7 @@ for (const { DESC, table } of examples) {
     }
   });
 }
+
+function a() {
+  
+}

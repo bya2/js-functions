@@ -1,4 +1,14 @@
-class Node<T> {
+interface NodeStruct<T> {
+  item: T;
+  prev?: Node<T>;
+  next?: Node<T>;
+}
+
+interface ImplNode<T> {
+  movesBy(n: number): Node<T> | undefined;
+}
+
+class Node<T> implements NodeStruct<T>, ImplNode<T> {
   _inner: T;
   prev?: Node<T>;
   next?: Node<T>;
@@ -7,8 +17,30 @@ class Node<T> {
     this._inner = item;
   }
 
+  set item(value: T) {
+    this._inner = value;
+  }
+
   get item(): T {
     return this._inner;
+  }
+
+  movesBy(n: number): Node<T> | undefined {
+    if (n === 0) return this;
+
+    if (n > 0) {
+      let node = this.next;
+      for (let i = 1; node && i < n; ++i) {
+        node = node.next;
+      }
+      return node;
+    } else {
+      let node = this.prev;
+      for (let i = n; node && i < -1; ++i) {
+        node = node.prev;
+      }
+      return node;
+    }
   }
 }
 
@@ -19,7 +51,13 @@ interface ListStruct<T> {
 }
 
 interface ImplList<T> {
-  at(index: number): T;
+  at(index: number): Node<T> | undefined;
+
+  move(node: Node<T>, from: number, to: number): Node<T> | undefined;
+
+  get(index: number): T | undefined;
+
+  set(index: number, value: T): Node<T>;
 
   unshift(...items: T[]): void;
 
@@ -33,6 +71,8 @@ interface ImplList<T> {
 
   extract(index: number): T | undefined;
 
+  slice(start?: number, end?: number): LinkedList<T>;
+
   find<S extends T>(predicate: (value: T, index: number, obj: this) => value is S, thisArg?: any): S | undefined;
   find(predicate: (value: T, index: number, obj: this) => unknown, thisArg?: any): T | undefined;
 
@@ -43,6 +83,10 @@ interface ImplList<T> {
 
   some(predicate: (value: T, index: number, obj: this) => unknown, thisArg?: any): boolean;
 
+  fill(value: T, start?: number, end?: number): this;
+
+  forEach(callbackfn: (value: T, index: number, obj: this) => void, thisArg?: any): void;
+
   filter(predicate: (value: T, index: number, obj: LinkedList<T>) => unknown, thisArg?: any): LinkedList<T>;
 
   map<U = any>(callbackfn: (value: T, index: number, obj: this) => U, thisArg?: any): LinkedList<U>;
@@ -51,12 +95,34 @@ interface ImplList<T> {
   reduce(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, obj: this) => T, initialValue: T): T;
   reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, obj: this) => U, initialValue: U): U;
 
+  // sort(compareFn?: (a: T, b: T) => number): this;
+
+  includes(searchElement: T, fromIndex?: number): boolean;
+
+  indexOf(searchElement: T, fromIndex?: number): number;
+
+  join(separator?: string): string;
+
+  reverse(): LinkedList<T>;
+
   clone(): LinkedList<T>;
 
   toArray(): T[];
 
   print(): void;
 }
+
+export const indexUtil = {
+  normalize: function (index: number, length: number): number {
+    return index < 0 ? (index % length) + length : ((index + 1) % length) - 1;
+  },
+
+  validate: function (index: number, length: number): void {
+    if (index < 0 || index >= length) {
+      throw new Error();
+    }
+  },
+};
 
 export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
   head?: Node<T>;
@@ -67,15 +133,13 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
     return this.#len;
   }
 
-  set length(n: number) {
-    let node = this.head;
-
-    for (let i = 0; node && i < n; ++i) node = node.next;
+  set length(value: number) {
+    let node = this.at(value) as Node<T> | undefined;
 
     while (node) {
-      const temp = node.next;
+      const tmp = node.next;
       node.next = undefined;
-      node = temp;
+      node = tmp;
       this.#len--;
     }
   }
@@ -86,46 +150,32 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
     }
   }
 
-  #validate(index: number) {
-    if (index < 0 && index >= this.#len) throw new Error();
+  at(index: number): Node<T> | undefined {
+    index = indexUtil.normalize(index, this.#len);
+    return index <= this.#len / 2 ? this.head!.movesBy(index)! : this.tail!.movesBy(index - this.#len + 1)!;
   }
 
-  #normalize(index: number): number {
-    if (index < 0) index += this.#len;
-    this.#validate(index);
-    return index;
+  move(node: Node<T>, fromIndex: number, toIndex: number): Node<T> | undefined {
+    fromIndex = indexUtil.normalize(fromIndex, this.#len);
+    toIndex = indexUtil.normalize(toIndex, this.#len);
+
+    return node.movesBy(toIndex - fromIndex);
   }
 
-  #nodeAt(index: number): Node<T> {
-    index = this.#normalize(index);
+  get(index: number): T | undefined {
+    index = indexUtil.normalize(index, this.#len);
+    return this.at(index)?._inner;
+  }
 
-    let node: Node<T>;
+  set(index: number, value: T): Node<T> {
+    index = indexUtil.normalize(index, this.#len);
 
-    if (index <= this.#len / 2) {
-      node = this.head!;
-      for (let i = 0; i < index; ++i) node = node.next!;
-    } else {
-      node = this.tail!;
-      for (let i = this.#len - 1; i > index; --i) node = node.prev!;
-    }
+    const node = this.at(index);
+    if (!node) throw new Error();
+
+    node._inner = value;
 
     return node;
-  }
-
-  at(index: number): T {
-    index = this.#normalize(index);
-
-    let node: Node<T>;
-
-    if (index <= this.#len / 2) {
-      node = this.head!;
-      for (let i = 0; i < index; ++i) node = node.next!;
-    } else {
-      node = this.tail!;
-      for (let i = this.#len - 1; i > index; --i) node = node.prev!;
-    }
-
-    return node._inner;
   }
 
   unshift(...items: T[]): void {
@@ -191,33 +241,31 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
   }
 
   insert(index: number, item: T): void {
-    if (index === this.#len) return this.push(item);
-    index = this.#normalize(index);
-    if (index === 0) return this.unshift(item);
+    index = indexUtil.normalize(index, this.#len);
 
-    const x = new Node(item);
-    const nx = this.#nodeAt(index);
+    if (index === 0) return this.unshift(item);
+    if (index === this.#len) return this.push(item);
+
+    const newX = new Node(item);
+    const nextX = this.at(index)!;
 
     // 인덱스에 해당되는 노드의 전 노드의 NEXT에 생성된 노드를 바인딩
-    if (nx.prev) {
-      const px = nx.prev;
-      px.next = x;
-      x.prev = px;
+    if (nextX.prev) {
+      const prevX = nextX.prev;
+      prevX.next = newX;
+      newX.prev = prevX;
     }
 
     // 인덱스에 해당되는 노드의 PREV에 생성된 노드를 바인딩
-    nx.prev = x;
-    x.next = nx;
+    nextX.prev = newX;
+    newX.next = nextX;
 
     this.#len++;
   }
 
-  #delete(node: Node<T>): void {
-    const px = node.prev!;
-    const nx = node.next!;
-
-    px.next = nx;
-    nx.prev = px;
+  delete(node: Node<T>): void {
+    node.prev && (node.prev.next = node.next);
+    node.next && (node.next.prev = node.prev);
 
     node.prev = undefined;
     node.next = undefined;
@@ -226,15 +274,45 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
   }
 
   extract(index: number): T | undefined {
-    index = this.#normalize(index);
+    index = indexUtil.normalize(index, this.#len);
 
     if (index === 0) return this.shift();
     if (index === this.#len - 1) return this.pop();
 
-    const x = this.#nodeAt(index);
-    this.#delete(x);
+    const node = this.at(index);
 
-    return x._inner;
+    if (!node) throw new Error();
+
+    this.delete(node);
+
+    return node._inner;
+  }
+
+  /**
+   * 얕은 복사
+   * @param start 
+   * @param end 
+
+  * @returns 
+   */
+  slice(start: number = 0, end: number = this.#len): LinkedList<T> {
+    const newList = new LinkedList<T>();
+
+    start = indexUtil.normalize(start, this.#len);
+    end = indexUtil.normalize(end, this.#len);
+
+    if (start > end) {
+      const temp = start;
+      start = end;
+      end = temp;
+    }
+
+    let node = this.at(start)!;
+    newList.head = node;
+    node = this.move(node, start, end)!;
+    newList.tail = node;
+
+    return newList;
   }
 
   find<S extends T>(predicate: (value: T, index: number, obj: this) => value is S, thisArg?: any): S | undefined;
@@ -285,6 +363,31 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
     return false;
   }
 
+  fill(value: T, start?: number, end?: number): this {
+    start ||= 0;
+    end ||= this.length;
+
+    if (start > end) {
+      const temp = start;
+      start = end;
+      end = temp;
+    }
+
+    let node: Node<T> | undefined = this.at(start);
+
+    for (let i = start; node && i < end; node = node.next, ++i) {
+      node._inner = value;
+    }
+
+    return this;
+  }
+
+  forEach(callbackfn: (value: T, index: number, obj: this) => void, thisArg?: any): void {
+    for (let node = this.head, i = 0; node; node = node.next, ++i) {
+      callbackfn.call(thisArg, node._inner, i, this);
+    }
+  }
+
   filter(predicate: (value: T, index: number, obj: LinkedList<T>) => unknown, thisArg?: any): LinkedList<T> {
     const ins = new LinkedList<T>();
 
@@ -294,6 +397,14 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
       }
     }
 
+    return ins;
+  }
+
+  map<U>(callbackfn: (value: T, index: number, obj: this) => U, thisArg?: any): LinkedList<U> {
+    const ins = new LinkedList<U>();
+    for (let node = this.head, i = 0; node; node = node.next, ++i) {
+      ins.push(callbackfn.call(thisArg, node._inner, i, this));
+    }
     return ins;
   }
 
@@ -318,23 +429,69 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
     return accu;
   }
 
+  includes(searchElement: T, fromIndex?: number): boolean {
+    fromIndex ||= 0;
+
+    let node = this.head;
+    for (let i = 0; node && i < fromIndex; node = node.next) {}
+
+    for (let i = fromIndex; node; node = node.next, ++i) {
+      if (node._inner === searchElement) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  indexOf(searchElement: T, fromIndex?: number | undefined): number {
+    fromIndex ||= 0;
+
+    let node = this.head;
+    for (let i = 0; node && i < fromIndex; node = node.next) {}
+
+    for (let i = fromIndex; node; node = node.next, ++i) {
+      if (node._inner === searchElement) {
+        return i;
+      }
+    }
+
+    return -1;
+  }
+
+  join(separator?: string | undefined): string {
+    if (!this.head) return "";
+
+    separator ||= ",";
+
+    let s = "" + this.head._inner;
+
+    for (let node = this.head.next; node; node = node.next) {
+      s += separator + node._inner;
+    }
+
+    return s;
+  }
+
   clone(): LinkedList<T> {
     const clone = new LinkedList<T>();
     for (let node = this.head; node; node = node.next) clone.push(node._inner);
     return clone;
   }
 
+  reverse(): LinkedList<T> {
+    const ins = new LinkedList<T>();
+
+    for (let node = this.tail; node; node.prev) {
+      ins.push(node._inner);
+    }
+
+    return ins;
+  }
+
   print() {
     const s = [];
     for (let node = this.head; node; node = node.next) s.push(node._inner);
     return `[ ${s.join(" <=> ")} ]`;
-  }
-
-  map<U>(callbackfn: (value: T, index: number, obj: this) => U, thisArg?: any): LinkedList<U> {
-    const ins = new LinkedList<U>();
-    for (let node = this.head, i = 0; node; node = node.next, ++i) {
-      ins.push(callbackfn.call(thisArg, node._inner, i, this));
-    }
-    return ins;
   }
 }
