@@ -1,18 +1,19 @@
+import Hole from "./Hole";
+
 interface ImplList<T> {
   pop(): T | undefined;
   push(item: T): void;
 }
 
 interface ImplBinaryHeap<T> extends ImplList<T> {
-  siftUp(): void;
-  siftDown(): void;
-  swap(i: number, j: number): void;
   compareFn(a: T, b: T): boolean;
-
-  compareChildren(i: number): number;
+  siftUp(start: number, pos: number): number;
+  siftDownRange(pos: number, end: number): void;
+  siftDown(pos: number): void;
+  siftDownToBottom(pos: number): void;
 }
 
-class BinaryHeap<T> implements ImplBinaryHeap<T> {
+export default class BinaryHeap<T> implements ImplBinaryHeap<T> {
   _inner: T[];
 
   constructor(compareFn: (a: T, b: T) => boolean, initialData: T[] = []) {
@@ -35,11 +36,14 @@ class BinaryHeap<T> implements ImplBinaryHeap<T> {
   }
 
   pop(): T | undefined {
-    if (this._inner.length <= 1) return this._inner.pop();
-    const data = this._inner[0];
-    this._inner[0] = this._inner.pop()!;
-    this.siftDown();
-    return data;
+    let item = this._inner.pop();
+
+    if (this._inner.length && item !== undefined) {
+      [item, this._inner[0]] = [this._inner[0], item];
+      this.siftDownToBottom(0);
+    }
+
+    return item;
   }
 
   push(item: T): void {
@@ -48,39 +52,91 @@ class BinaryHeap<T> implements ImplBinaryHeap<T> {
     this.siftUp(0, oldLen);
   }
 
-  siftUp(start: number, pos: number) {
-    let i = this._inner.length - 1;
-    let parent = (i - 1) >> 1;
-
-    while (i > start && this.compareFn(this._inner[i], this._inner[parent])) {
-      this.swap(i, parent);
-      i = parent;
-      parent = (i - 1) >> 1;
-    }
-  }
-
-  siftDown() {
-    let i = 0;
-    let child = this.compareChildren(i);
-
-    while (child < this._inner.length && this.compareFn(this._inner[child], this._inner[i])) {
-      this.swap(i, child);
-      i = child;
-      child = this.compareChildren(i);
-    }
-  }
-
-  swap(i: number, j: number) {
-    [this._inner[i], this._inner[j]] = [this._inner[j], this._inner[i]];
-  }
-
   compareFn: (a: T, b: T) => boolean;
 
-  compareChildren(i: number): number {
-    const li = i * 2 + 1;
-    const ri = li + 1;
-    return ri in this._inner && this.compareFn(this._inner[ri], this._inner[li]) ? ri : li;
+  siftUp(start: number, pos: number): number {
+    const hole = new Hole(this._inner, pos);
+
+    while (hole.pos > start) {
+      const parent = (hole.pos - 1) >> 1;
+      if (this.compareFn(hole.element, hole.get(parent))) break;
+      hole.moveTo(parent);
+    }
+
+    return hole.pos;
+  }
+
+  siftDownRange(pos: number, end: number) {
+    const hole = new Hole(this._inner, pos);
+    let child = 2 * hole.pos + 1;
+
+    const eend = end - 2 || 0;
+
+    while (child <= eend) {
+      if (this.compareFn(hole.get(child + 1), hole.get(child))) child++;
+      if (hole.element >= hole.get(child)) return;
+      hole.moveTo(child);
+      child = 2 * hole.pos + 1;
+    }
+
+    if (child === end - 1 && hole.element < hole.get(child)) {
+      hole.moveTo(child);
+    }
+  }
+
+  siftDown(pos: number) {
+    this.siftDownRange(pos, this._inner.length);
+  }
+
+  siftDownToBottom(pos: number) {
+    const end = this._inner.length;
+    const start = pos;
+
+    const hole = new Hole(this._inner, pos);
+    let child = 2 * hole.pos + 1;
+
+    const eend = end - 2 || 0;
+
+    while (child <= eend) {
+      if (this.compareFn(hole.get(child), hole.get(child + 1))) child++;
+      hole.moveTo(child);
+      child = 2 * hole.pos + 1;
+    }
+
+    if (child === end - 1) {
+      hole.moveTo(child);
+    }
+
+    pos = hole.pos;
+
+    this.siftUp(start, pos);
   }
 }
 
-export default BinaryHeap;
+// siftUp(start: number, pos: number) {
+//   let i = this._inner.length - 1;
+//   let parent = (i - 1) >> 1;
+
+//   while (i > start && this.compareFn(this._inner[i], this._inner[parent])) {
+//     this.swap(i, parent);
+//     i = parent;
+//     parent = (i - 1) >> 1;
+//   }
+// }
+
+// siftDown() {
+//   let i = 0;
+//   let child = this.compareChildren(i);
+
+//   while (child < this._inner.length && this.compareFn(this._inner[child], this._inner[i])) {
+//     this.swap(i, child);
+//     i = child;
+//     child = this.compareChildren(i);
+//   }
+// }
+
+// compareChildren(i: number): number {
+//   const li = i * 2 + 1;
+//   const ri = li + 1;
+//   return ri in this._inner && this.compareFn(this._inner[ri], this._inner[li]) ? ri : li;
+// }
