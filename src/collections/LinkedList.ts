@@ -243,6 +243,8 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
   insert(index: number, item: T): void {
     index = indexUtil.normalize(index, this.#len);
 
+    console.assert(index < 0 || index >= this.#len);
+
     if (index === 0) return this.unshift(item);
     if (index === this.#len) return this.push(item);
 

@@ -8,9 +8,33 @@ interface ImplList<T> {
 interface ImplBinaryHeap<T> extends ImplList<T> {
   compareFn(a: T, b: T): boolean;
   siftUp(start: number, pos: number): number;
+
+  /**
+   * 'pos'에 있는 요소를 가져와 힙 아래로 이동하고 그 자식은 더 크게 이동.
+   * @param pos
+   * @param end
+   */
   siftDownRange(pos: number, end: number): void;
+
+  /**
+   * 호출자는 `pos < this._inner.length`을 보장해야 함.
+   * @param pos
+   */
   siftDown(pos: number): void;
+
+  /**
+   * 'pos'에 있는 요소를 가져와 힙 아래로 끝까지 이동한 다음 해당 위치까지 선별.
+   * @param pos
+   */
   siftDownToBottom(pos: number): void;
+
+  /**
+   * 데이터[0..start]가 여전히 적절한 힙이라고 가정하고 다시 빌드.
+   * @param start
+   */
+  rebuildTail(start: number): void;
+  rebuild(): void;
+  concat(other: BinaryHeap<T>): this;
 }
 
 export default class BinaryHeap<T> implements ImplBinaryHeap<T> {
@@ -19,6 +43,10 @@ export default class BinaryHeap<T> implements ImplBinaryHeap<T> {
   constructor(compareFn: (a: T, b: T) => boolean, initialData: T[] = []) {
     this.compareFn = compareFn;
     this._inner = initialData;
+
+    if (initialData.length > 0) {
+      this.rebuildTail(0);
+    }
   }
 
   get data() {
@@ -111,32 +139,46 @@ export default class BinaryHeap<T> implements ImplBinaryHeap<T> {
 
     this.siftUp(start, pos);
   }
+
+  rebuildTail(start: number) {
+    if (start === this._inner.length) {
+      return;
+    }
+
+    const tailLen = this._inner.length - start;
+
+    const log2Fast = (x: number): number => {
+      if (x === 0) return -Infinity;
+      return (x >>> 0).toString(2).length - 1;
+    };
+
+    const betterToRebuild =
+      start < tailLen
+        ? true
+        : this._inner.length <= 2048
+        ? 2 * this._inner.length < tailLen * log2Fast(start)
+        : 2 * this._inner.length < tailLen * 11;
+
+    if (betterToRebuild) this.rebuild();
+    else {
+      for (let i = start; i < this._inner.length; ++i) {
+        this.siftUp(0, i);
+      }
+    }
+  }
+
+  rebuild() {
+    let n = this._inner.length >> 1;
+    while (n > 0) {
+      n--;
+      this.siftDown(n);
+    }
+  }
+
+  concat(other: BinaryHeap<T>) {
+    const start = this._inner.length;
+    this._inner.concat(other.data);
+    this.rebuildTail(start);
+    return this;
+  }
 }
-
-// siftUp(start: number, pos: number) {
-//   let i = this._inner.length - 1;
-//   let parent = (i - 1) >> 1;
-
-//   while (i > start && this.compareFn(this._inner[i], this._inner[parent])) {
-//     this.swap(i, parent);
-//     i = parent;
-//     parent = (i - 1) >> 1;
-//   }
-// }
-
-// siftDown() {
-//   let i = 0;
-//   let child = this.compareChildren(i);
-
-//   while (child < this._inner.length && this.compareFn(this._inner[child], this._inner[i])) {
-//     this.swap(i, child);
-//     i = child;
-//     child = this.compareChildren(i);
-//   }
-// }
-
-// compareChildren(i: number): number {
-//   const li = i * 2 + 1;
-//   const ri = li + 1;
-//   return ri in this._inner && this.compareFn(this._inner[ri], this._inner[li]) ? ri : li;
-// }
