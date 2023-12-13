@@ -5,7 +5,7 @@ interface NodeStruct<T> {
 }
 
 interface ImplNode<T> {
-  movesBy(n: number): Node<T> | undefined;
+  moveBy(n: number): Node<T> | undefined;
 }
 
 class Node<T> implements NodeStruct<T>, ImplNode<T> {
@@ -25,7 +25,7 @@ class Node<T> implements NodeStruct<T>, ImplNode<T> {
     return this._inner;
   }
 
-  movesBy(n: number): Node<T> | undefined {
+  moveBy(n: number): Node<T> | undefined {
     if (n === 0) return this;
 
     if (n > 0) {
@@ -58,6 +58,8 @@ interface ImplList<T> {
   get(index: number): T | undefined;
 
   set(index: number, value: T): Node<T>;
+
+  addFront(node: Node<T>): void;
 
   unshift(...items: T[]): void;
 
@@ -152,14 +154,14 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
 
   at(index: number): Node<T> | undefined {
     index = indexUtil.normalize(index, this.#len);
-    return index <= this.#len / 2 ? this.head!.movesBy(index)! : this.tail!.movesBy(index - this.#len + 1)!;
+    return index <= this.#len / 2 ? this.head!.moveBy(index)! : this.tail!.moveBy(index - this.#len + 1)!;
   }
 
   move(node: Node<T>, fromIndex: number, toIndex: number): Node<T> | undefined {
     fromIndex = indexUtil.normalize(fromIndex, this.#len);
     toIndex = indexUtil.normalize(toIndex, this.#len);
 
-    return node.movesBy(toIndex - fromIndex);
+    return node.moveBy(toIndex - fromIndex);
   }
 
   get(index: number): T | undefined {
@@ -178,66 +180,70 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
     return node;
   }
 
+  addFront(node: Node<T>) {
+    node.next = this.head;
+    node.prev = undefined;
+
+    if (this.head) {
+      this.head.prev = node;
+    } else {
+      this.tail = node;
+    }
+
+    this.head = node;
+    this.#len++;
+  }
+
   unshift(...items: T[]): void {
     for (const item of items) {
-      const node = new Node(item);
-      if (this.head) {
-        this.head.prev = node;
-        node.next = this.head;
-        this.head = node;
-      } else {
-        this.tail = this.head = node;
-      }
-      this.#len++;
+      this.addFront(new Node(item));
     }
   }
 
   shift(): T | undefined {
-    if (!this.head) return undefined;
+    const node = this.head;
+    this.head = node?.next;
 
-    const value = this.head._inner;
-
-    if (this.head.next) {
-      this.head = this.head.next;
+    if (this.head) {
       this.head.prev = undefined;
     } else {
-      this.tail = this.head = undefined;
+      this.tail = undefined;
     }
 
     this.#len--;
 
-    return value;
+    return node?._inner;
   }
 
   push(item: T): void {
     const node = new Node(item);
 
+    node.next = undefined;
+    node.prev = this.tail;
+
     if (this.tail) {
-      node.prev = this.tail;
       this.tail.next = node;
-      this.tail = node;
     } else {
-      this.tail = this.head = node;
+      this.head = node;
     }
 
+    this.tail = node;
     this.#len++;
   }
 
   pop(): T | undefined {
-    if (!this.tail) return undefined;
+    const node = this.tail;
+    this.tail = node?.prev;
 
-    const value = this.tail._inner;
-
-    if (this.tail.prev) {
-      this.tail = this.tail.prev;
+    if (this.tail) {
       this.tail.next = undefined;
     } else {
-      this.tail = this.head = undefined;
+      this.head = undefined;
     }
 
     this.#len--;
 
-    return value;
+    return node?._inner;
   }
 
   insert(index: number, item: T): void {
@@ -265,12 +271,12 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
     this.#len++;
   }
 
-  delete(node: Node<T>): void {
-    node.prev && (node.prev.next = node.next);
-    node.next && (node.next.prev = node.prev);
+  unlink(node: Node<T>): void {
+    node.prev ? (node.prev.next = node.next) : (this.head = node.next);
+    node.next ? (node.next.prev = node.prev) : (this.tail = node.prev);
 
-    node.prev = undefined;
-    node.next = undefined;
+    // node.prev = undefined;
+    // node.next = undefined;
 
     this.#len--;
   }
@@ -285,7 +291,7 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
 
     if (!node) throw new Error();
 
-    this.delete(node);
+    this.unlink(node);
 
     return node._inner;
   }
