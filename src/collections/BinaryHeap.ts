@@ -1,12 +1,15 @@
 import Hole from "./Hole";
 
-interface ImplList<T> {
+interface ImplBinaryHeap<T> {
   pop(): T | undefined;
   push(item: T): void;
-}
-
-interface ImplBinaryHeap<T> extends ImplList<T> {
   compareFn(a: T, b: T): boolean;
+
+  /**
+   * 힙 위로 이동
+   * @param start
+   * @param pos
+   */
   siftUp(start: number, pos: number): number;
 
   /**

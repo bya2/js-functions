@@ -289,6 +289,8 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
 
     const node = this.at(index);
 
+    console.assert(node !== undefined);
+
     if (!node) throw new Error();
 
     this.unlink(node);
