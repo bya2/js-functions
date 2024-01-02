@@ -408,6 +408,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@bya2/js-option@npm:^1.0.7":
+  version: 1.0.7
+  resolution: "@bya2/js-option@npm:1.0.7"
+  dependencies:
+    "@bya2/js-result": "npm:^1.0.5"
+  checksum: 3f0fec8ef5b5d840e009b43f5d58263f7f1fc5a3bc3e72505a4c76dc4561e7631c0e8f4f738293b22193e609cf7a02f9b5354b776db83c7acc0da9a6a76d5af0
+  languageName: node
+  linkType: hard
+
+"@bya2/js-result@npm:^1.0.5":
+  version: 1.0.6
+  resolution: "@bya2/js-result@npm:1.0.6"
+  dependencies:
+    "@bya2/js-option": "npm:^1.0.7"
+  checksum: 6c9cb79b327fa505ddae9a35231284abba0819f8202bdc407d4fab835e5bd6c89dcdb845d24ef046d76558d493d0e90df594aa05ca55dbfa3bc825acd1798795
+  languageName: node
+  linkType: hard
+
 "@isaacs/cliui@npm:^8.0.2":
   version: 8.0.2
   resolution: "@isaacs/cliui@npm:8.0.2"
@@ -2401,6 +2419,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "js-functions@workspace:."
   dependencies:
+    "@bya2/js-option": "npm:^1.0.7"
     "@types/jest": "npm:^29.2.1"
     jest: "npm:^29.2.2"
     prettier: "npm:2.7.1"
