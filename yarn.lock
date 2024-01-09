@@ -408,21 +408,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bya2/js-option@npm:^1.0.7":
-  version: 1.0.7
-  resolution: "@bya2/js-option@npm:1.0.7"
+"@bya2/js-option@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@bya2/js-option@npm:1.1.1"
   dependencies:
-    "@bya2/js-result": "npm:^1.0.5"
-  checksum: 3f0fec8ef5b5d840e009b43f5d58263f7f1fc5a3bc3e72505a4c76dc4561e7631c0e8f4f738293b22193e609cf7a02f9b5354b776db83c7acc0da9a6a76d5af0
+    "@bya2/js-result": "npm:^1.1.0"
+    lodash.isequal: "npm:^4.5.0"
+  checksum: 51ad1c032f090311cb1cf50796dd5bff65bb3dd53d6eacfa281ef5ea0628cd4f9e5c7716f90c0eca0228fae911f938b9b2d330085ce613c7bc34a0bea2f636ed
   languageName: node
   linkType: hard
 
-"@bya2/js-result@npm:^1.0.5":
-  version: 1.0.6
-  resolution: "@bya2/js-result@npm:1.0.6"
+"@bya2/js-result@npm:^1.1.0, @bya2/js-result@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@bya2/js-result@npm:1.1.1"
   dependencies:
-    "@bya2/js-option": "npm:^1.0.7"
-  checksum: 6c9cb79b327fa505ddae9a35231284abba0819f8202bdc407d4fab835e5bd6c89dcdb845d24ef046d76558d493d0e90df594aa05ca55dbfa3bc825acd1798795
+    "@bya2/js-option": "npm:^1.1.1"
+    lodash.isequal: "npm:^4.5.0"
+  checksum: 531e694a2f1dd4efe235a1605b7c1cf0fa8a7d4af3bd28b923d87755e338b6396d9e2053a1da78e9e9c9f28bec1b26bf550bc9a2025deb2e5e0ded01d1e1d500
   languageName: node
   linkType: hard
 
@@ -2419,7 +2421,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "js-functions@workspace:."
   dependencies:
-    "@bya2/js-option": "npm:^1.0.7"
+    "@bya2/js-option": "npm:^1.1.1"
+    "@bya2/js-result": "npm:^1.1.1"
     "@types/jest": "npm:^29.2.1"
     jest: "npm:^29.2.2"
     prettier: "npm:2.7.1"
@@ -2499,6 +2502,13 @@ __metadata:
   dependencies:
     p-locate: "npm:^4.1.0"
   checksum: 33a1c5247e87e022f9713e6213a744557a3e9ec32c5d0b5efb10aa3a38177615bf90221a5592674857039c1a0fd2063b82f285702d37b792d973e9e72ace6c59
+  languageName: node
+  linkType: hard
+
+"lodash.isequal@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "lodash.isequal@npm:4.5.0"
+  checksum: dfdb2356db19631a4b445d5f37868a095e2402292d59539a987f134a8778c62a2810c2452d11ae9e6dcac71fc9de40a6fedcb20e2952a15b431ad8b29e50e28f
   languageName: node
   linkType: hard
 

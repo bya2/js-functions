@@ -1,3 +1,5 @@
+import { Option, Some, None } from "@bya2/js-option";
+
 interface NodeStruct<T> {
   item: T;
   prev?: Node<T>;
@@ -8,7 +10,7 @@ interface ImplNode<T> {
   moveBy(n: number): Node<T> | undefined;
 }
 
-class Node<T> implements NodeStruct<T>, ImplNode<T> {
+class Node<T> {
   _inner: T;
   prev?: Node<T>;
   next?: Node<T>;

@@ -40,6 +40,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@bya2/js-option": "*"
+    "@bya2/js-option": "^1.1.1",
+    "@bya2/js-result": "^1.1.1"
   }
 }
