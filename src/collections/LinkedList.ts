@@ -77,27 +77,77 @@ interface ImplList<T> {
 
   slice(start?: number, end?: number): LinkedList<T>;
 
-  find<S extends T>(predicate: (value: T, index: number, obj: this) => value is S, thisArg?: any): S | undefined;
-  find(predicate: (value: T, index: number, obj: this) => unknown, thisArg?: any): T | undefined;
+  find<S extends T>(
+    predicate: (value: T, index: number, obj: this) => value is S,
+    thisArg?: any
+  ): S | undefined;
+  find(
+    predicate: (value: T, index: number, obj: this) => unknown,
+    thisArg?: any
+  ): T | undefined;
 
-  findIndex(predicate: (value: T, index: number, obj: LinkedList<T>) => unknown, thisArg?: any): number;
+  findIndex(
+    predicate: (value: T, index: number, obj: LinkedList<T>) => unknown,
+    thisArg?: any
+  ): number;
 
-  every<S extends T>(predicate: (value: T, index: number, obj: this) => value is S, thisArg?: any): this is S[];
-  every(predicate: (value: T, index: number, obj: this) => unknown, thisArg?: any): boolean;
+  every<S extends T>(
+    predicate: (value: T, index: number, obj: this) => value is S,
+    thisArg?: any
+  ): this is S[];
+  every(
+    predicate: (value: T, index: number, obj: this) => unknown,
+    thisArg?: any
+  ): boolean;
 
-  some(predicate: (value: T, index: number, obj: this) => unknown, thisArg?: any): boolean;
+  some(
+    predicate: (value: T, index: number, obj: this) => unknown,
+    thisArg?: any
+  ): boolean;
 
   fill(value: T, start?: number, end?: number): this;
 
-  forEach(callbackfn: (value: T, index: number, obj: this) => void, thisArg?: any): void;
+  forEach(
+    callbackfn: (value: T, index: number, obj: this) => void,
+    thisArg?: any
+  ): void;
 
-  filter(predicate: (value: T, index: number, obj: LinkedList<T>) => unknown, thisArg?: any): LinkedList<T>;
+  filter(
+    predicate: (value: T, index: number, obj: LinkedList<T>) => unknown,
+    thisArg?: any
+  ): LinkedList<T>;
 
-  map<U = any>(callbackfn: (value: T, index: number, obj: this) => U, thisArg?: any): LinkedList<U>;
+  map<U = any>(
+    callbackfn: (value: T, index: number, obj: this) => U,
+    thisArg?: any
+  ): LinkedList<U>;
 
-  reduce(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, obj: this) => T): T;
-  reduce(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, obj: this) => T, initialValue: T): T;
-  reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, obj: this) => U, initialValue: U): U;
+  reduce(
+    callbackfn: (
+      previousValue: T,
+      currentValue: T,
+      currentIndex: number,
+      obj: this
+    ) => T
+  ): T;
+  reduce(
+    callbackfn: (
+      previousValue: T,
+      currentValue: T,
+      currentIndex: number,
+      obj: this
+    ) => T,
+    initialValue: T
+  ): T;
+  reduce<U>(
+    callbackfn: (
+      previousValue: U,
+      currentValue: T,
+      currentIndex: number,
+      obj: this
+    ) => U,
+    initialValue: U
+  ): U;
 
   // sort(compareFn?: (a: T, b: T) => number): this;
 
@@ -156,7 +206,9 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
 
   at(index: number): Node<T> | undefined {
     index = indexUtil.normalize(index, this.#len);
-    return index <= this.#len / 2 ? this.head!.moveBy(index)! : this.tail!.moveBy(index - this.#len + 1)!;
+    return index <= this.#len / 2
+      ? this.head!.moveBy(index)!
+      : this.tail!.moveBy(index - this.#len + 1)!;
   }
 
   move(node: Node<T>, fromIndex: number, toIndex: number): Node<T> | undefined {
@@ -327,18 +379,34 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
     return newList;
   }
 
-  find<S extends T>(predicate: (value: T, index: number, obj: this) => value is S, thisArg?: any): S | undefined;
-  find(predicate: (value: T, index: number, obj: this) => unknown, thisArg?: any): T | undefined;
+  find<S extends T>(
+    predicate: (value: T, index: number, obj: this) => value is S,
+    thisArg?: any
+  ): S | undefined;
+  find(
+    predicate: (value: T, index: number, obj: this) => unknown,
+    thisArg?: any
+  ): T | undefined;
   find(predicate: unknown, thisArg?: unknown): T | undefined {
     for (let node = this.head, i = 0; node; node = node.next, ++i) {
-      if ((<(value: T, index: number, obj: this) => T | undefined>predicate).call(thisArg, node._inner, i, this)) {
+      if (
+        (<(value: T, index: number, obj: this) => T | undefined>predicate).call(
+          thisArg,
+          node._inner,
+          i,
+          this
+        )
+      ) {
         return node._inner;
       }
     }
     return undefined;
   }
 
-  findIndex(predicate: (value: T, index: number, obj: LinkedList<T>) => unknown, thisArg?: any): number {
+  findIndex(
+    predicate: (value: T, index: number, obj: LinkedList<T>) => unknown,
+    thisArg?: any
+  ): number {
     for (let node = this.head, i = 0; node; node = node.next, ++i) {
       if (predicate.call(thisArg, node._inner, i, this)) {
         return i;
@@ -351,13 +419,26 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
     return [...this];
   }
 
-  every<S extends T>(predicate: (value: T, index: number, obj: this) => value is S, thisArg?: any): this is S[];
-  every(predicate: (value: T, index: number, obj: this) => unknown, thisArg?: any): boolean;
+  every<S extends T>(
+    predicate: (value: T, index: number, obj: this) => value is S,
+    thisArg?: any
+  ): this is S[];
+  every(
+    predicate: (value: T, index: number, obj: this) => unknown,
+    thisArg?: any
+  ): boolean;
   every(predicate: unknown, thisArg?: unknown): boolean {
     if (typeof predicate !== "function") throw new Error();
 
     for (let node = this.head, i = 0; node; node = node.next, ++i) {
-      if (!(<(value: T, index: number, obj: this) => boolean>predicate).call(thisArg, node._inner, i, this)) {
+      if (
+        !(<(value: T, index: number, obj: this) => boolean>predicate).call(
+          thisArg,
+          node._inner,
+          i,
+          this
+        )
+      ) {
         return false;
       }
     }
@@ -365,7 +446,10 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
     return true;
   }
 
-  some(predicate: (value: T, index: number, obj: this) => unknown, thisArg?: any): boolean {
+  some(
+    predicate: (value: T, index: number, obj: this) => unknown,
+    thisArg?: any
+  ): boolean {
     for (let node = this.head, i = 0; node; node = node.next, ++i) {
       if (predicate.call(thisArg, node._inner, i, this)) {
         return true;
@@ -394,13 +478,19 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
     return this;
   }
 
-  forEach(callbackfn: (value: T, index: number, obj: this) => void, thisArg?: any): void {
+  forEach(
+    callbackfn: (value: T, index: number, obj: this) => void,
+    thisArg?: any
+  ): void {
     for (let node = this.head, i = 0; node; node = node.next, ++i) {
       callbackfn.call(thisArg, node._inner, i, this);
     }
   }
 
-  filter(predicate: (value: T, index: number, obj: LinkedList<T>) => unknown, thisArg?: any): LinkedList<T> {
+  filter(
+    predicate: (value: T, index: number, obj: LinkedList<T>) => unknown,
+    thisArg?: any
+  ): LinkedList<T> {
     const ins = new LinkedList<T>();
 
     for (let node = this.head, i = 0; node; node = node.next, ++i) {
@@ -412,7 +502,10 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
     return ins;
   }
 
-  map<U>(callbackfn: (value: T, index: number, obj: this) => U, thisArg?: any): LinkedList<U> {
+  map<U>(
+    callbackfn: (value: T, index: number, obj: this) => U,
+    thisArg?: any
+  ): LinkedList<U> {
     const ins = new LinkedList<U>();
     for (let node = this.head, i = 0; node; node = node.next, ++i) {
       ins.push(callbackfn.call(thisArg, node._inner, i, this));
@@ -420,9 +513,32 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
     return ins;
   }
 
-  reduce(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, obj: this) => T): T;
-  reduce(callbackfn: (previousValue: T, currentValue: T, currentIndex: number, obj: this) => T, initialValue: T): T;
-  reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, obj: this) => U, initialValue: U): U;
+  reduce(
+    callbackfn: (
+      previousValue: T,
+      currentValue: T,
+      currentIndex: number,
+      obj: this
+    ) => T
+  ): T;
+  reduce(
+    callbackfn: (
+      previousValue: T,
+      currentValue: T,
+      currentIndex: number,
+      obj: this
+    ) => T,
+    initialValue: T
+  ): T;
+  reduce<U>(
+    callbackfn: (
+      previousValue: U,
+      currentValue: T,
+      currentIndex: number,
+      obj: this
+    ) => U,
+    initialValue: U
+  ): U;
   reduce(callbackfn: unknown, initialValue?: any): T {
     if (typeof callbackfn !== "function") throw new Error();
 
@@ -435,7 +551,14 @@ export default class LinkedList<T> implements ListStruct<T>, ImplList<T> {
     const si = initialValue !== undefined ? 0 : 1;
 
     for (let node = sn, i = si; node; node = node.next, ++i) {
-      accu = (<(previousValue: any, currentValue: T, currentIndex: number, obj: LinkedList<T>) => T>callbackfn)(accu, node._inner, i, this);
+      accu = (<
+        (
+          previousValue: any,
+          currentValue: T,
+          currentIndex: number,
+          obj: LinkedList<T>
+        ) => T
+      >callbackfn)(accu, node._inner, i, this);
     }
 
     return accu;

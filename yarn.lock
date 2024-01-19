@@ -428,6 +428,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@bya2/prettier-config-base@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "@bya2/prettier-config-base@npm:0.1.0::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40bya2%2Fprettier-config-base%2F0.1.0%2F75198fdeec0a106b0b292ce19f9a0d7b122e08ee"
+  peerDependencies:
+    prettier: ">=3.0.0"
+  checksum: 989de2fd52221e823c0106dae5b0cc2b12e148783e03bd60f065a616a99cc2a2ce87718dafea30716941d4c8c02057eb2f137ce5afe01a8ca8865c0a5792a16b
+  languageName: node
+  linkType: hard
+
 "@isaacs/cliui@npm:^8.0.2":
   version: 8.0.2
   resolution: "@isaacs/cliui@npm:8.0.2"
@@ -2423,6 +2432,7 @@ __metadata:
   dependencies:
     "@bya2/js-option": "npm:^1.1.1"
     "@bya2/js-result": "npm:^1.1.1"
+    "@bya2/prettier-config-base": "npm:^0.1.0"
     "@types/jest": "npm:^29.2.1"
     jest: "npm:^29.2.2"
     prettier: "npm:2.7.1"

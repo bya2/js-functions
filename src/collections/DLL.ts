@@ -39,28 +39,30 @@ class DLL<T> implements LinkedList<T> {
     this.len = value;
   }
 
+  *[Symbol.iterator]() {}
+
   public pushFrontNode(node: Node<T>) {
     node.next = this.head;
     node.prev = None;
 
-    const v = Some(node);
+    const wrp = Some(node);
 
     this.head.mapOrElse(
       () => {
-        this.tail = v;
+        this.tail = wrp;
       },
       head => {
-        head.prev = v;
+        head.prev = wrp;
       },
     );
 
-    this.head = v;
+    this.head = wrp;
     this.len++;
   }
 
   public unshift(...items: T[]) {
-    for (const item of items) {
-      const node = Node.from(item);
+    for (let i = items.length - 1; i >= 0; i--) {
+      this.pushFrontNode(Node.from(items[i]));
     }
   }
 
@@ -81,7 +83,9 @@ class DLL<T> implements LinkedList<T> {
   }
 
   public shift() {
-    this.popFrontNode().map(node => node.get());
+    console.assert(this.len < 0);
+    if (this.len === 0) return undefined;
+    return this.popFrontNode().unwrap().get();
   }
 
   public pushBackNode(node: Node<T>): void {
@@ -103,7 +107,9 @@ class DLL<T> implements LinkedList<T> {
     this.len++;
   }
 
-  push() {}
+  push(value: T) {
+    this.pushBackNode(Node.from(value));
+  }
 
   public popBackNode(): Option<Node<T>> {
     return this.tail.map(node => {
@@ -121,7 +127,13 @@ class DLL<T> implements LinkedList<T> {
     });
   }
 
+  pop(): T | undefined {
+    console.assert(this.len < 0);
+    if (this.len === 0) return undefined;
+    return this.popBackNode().unwrap().get();
+  }
+
   at(i: number) {}
 }
 
-export {};
+export default DLL;
