@@ -1,48 +1,53 @@
 {
-  "name": "js-functions",
-  "version": "0.1.0",
-  "prettier": "@bya2/prettier-config-base",
-  "description": "자바스크립트로 작성된 함수 모음",
-  "author": "Jinhyeong Lee <byaa1972@gmail.com>",
-  "repository": "https://github.com/bya2/js-functions.git",
-  "bugs": "https://github.com/bya2/js-functions/issues",
+  "name": "@bya2/collections",
+  "version": "0.0.0",
+  "description": "Use javascript collections.",
+  "bugs": "https://github.com/bya2/collections/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bya2/collections.git"
+  },
+  "license": "MIT",
+  "author": "Jinhyeong Lee <byaa1972@gmail.com> (https://github.com/bya2)",
+  "type": "module",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
   "files": [
     "dist",
     "LICENSE",
     "README.md"
   ],
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "require": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      }
-    }
-  },
-  "packageManager": "yarn@4.0.2",
   "scripts": {
+    "build": "tsup",
+    "compile": "tsc",
     "test": "jest -o",
     "test:all": "jest",
+    "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
-    "test:watch:all": "jest --watchAll",
-    "test:coverage": "jest --coverage"
-  },
-  "devDependencies": {
-    "@bya2/prettier-config-base": "^0.1.0",
-    "@types/jest": "^29.2.1",
-    "jest": "^29.2.2",
-    "prettier": "2.7.1",
-    "ts-jest": "^29.0.3",
-    "typescript": "^5.2.2"
+    "test:watch:all": "jest --watchAll"
   },
   "dependencies": {
-    "@bya2/js-option": "^1.1.1",
-    "@bya2/js-result": "^1.1.1"
-  }
+    "@bya2/rusty-container-api": "1.3.1"
+  },
+  "devDependencies": {
+    "@types/jest": "29.5.12",
+    "@types/node": "^20.12.7",
+    "jest": "29.7.0",
+    "prettier": "3.2.5",
+    "prettier-plugin-packagejson": "^2.5.0",
+    "ts-jest": "29.1.2",
+    "tsup": "8.0.2",
+    "typescript": "^5.4.5"
+  },
+  "packageManager": "pnpm@8.9.0"
 }
