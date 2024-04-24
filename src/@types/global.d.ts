@@ -1,12 +1,16 @@
-import type { SomeType, NoneType } from "@bya2/js-option";
-import type { OkType, ErrType } from "@bya2/js-result";
-
 export declare global {
-  type Option<T> = import("@bya2/js-option").Option<T>;
-  function Some<T>(value: T): SomeType<T>;
-  const None: NoneType;
+  // Option
+  type Option<T> = import("@bya2/rusty-container-api").Option<T>;
+  function Some<T>(expr: T): Option<T>;
+  const None: Option<any>;
 
-  type Result<T, E> = import("@bya2/js-result").Result<T, E>;
-  function Ok<T>(value: T): OkType<T>;
-  function Err<E>(error: E): ErrType<E>;
+  // Result
+  type Result<T, E> = import("@bya2/rusty-container-api").Result<T, E>;
+  function Ok<T, E>(expr: T): Result<T, E>;
+  function Err<T, E>(expr: E): Result<T, E>;
+
+  // Array.prototype
+  interface Array<T> {
+    swap(i: number, j: number): void;
+  }
 }
