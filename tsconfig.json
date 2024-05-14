@@ -3,7 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@collections/*": ["src/collections/*"],
+      "@/graphs/*": ["src/graphs/*"]
     },
     "noImplicitAny": false
   },
