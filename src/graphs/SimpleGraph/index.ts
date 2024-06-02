@@ -15,11 +15,22 @@ class Node<T> {
 export default class SimpleGraph<T> {
   nodes: Map<number, Node<T>> = new Map();
 
-  neighbors(ix: number) {}
+  neighbors(ix: number) {
+    const { nodes } = this;
+
+    if (ix < 0 || ix >= nodes.size) {
+      throw new Error();
+    }
+
+    const node = this.nodes[ix]!;
+
+    for (const succ of node.neighbors) {
+    }
+  }
 
   add(item: T) {
-    const idx = this.nodes.size;
-    this.nodes.set(idx, new Node(item));
+    const ix = this.nodes.size;
+    this.nodes.set(ix, new Node(item));
     return this.nodes.size;
   }
 
