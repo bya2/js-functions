@@ -1,110 +1,125 @@
-export default class Prime {
-  /**
-   * 소수인지 판별하여 리턴
-   * @param n
-   */
-  static isPrimeNumber(n: number): boolean {
-    for (let i = 3, len = Math.sqrt(n); i <= len; i += 2) {
-      if (n % i === 0) return false;
-    }
-    return n >= 2;
+// 소수 판별
+// [범위 내] 소수의 개수
+// [범위 내] 소수 목록
+
+export function binarySearchIndex(arr: number[], n: number): number {
+  let si = 0;
+  let ei = arr.length - 1;
+
+  while (si <= ei) {
+    let mi = (si + ei) >> 1;
+    if (arr[mi] === n) return mi;
+    if (arr[mi]! < n) si = ++mi;
+    else ei = --mi;
   }
 
-  /**
-   * 'from'부터 'to'까지의 소수 리스트를 Set으로 리턴
-   * @param from
-   * @param to
-   */
-  static between(from: number, to: number): Set<number> {
-    const set = new Set<number>();
-    if (from <= 2) set.add(2);
-    for (let i = from <= 3 ? 3 : from; i < to; i += 2) {
-      if (this.isPrimeNumber(i)) set.add(i);
-    }
-    return set;
-  }
-
-  /**
-   * 'from'부터 'to'까지 소수의 개수를 리턴
-   * @param from
-   * @param to
-   */
-  static numberOf(from: number, to: number): number {
-    let count = from <= 2 ? 1 : 0;
-    for (let i = from <= 3 ? 3 : from; i <= to; i += 2) {
-      if (this.isPrimeNumber(i)) ++count;
-    }
-    return count;
-  }
+  return -1;
 }
 
-export const algorithm__Sieve_Of_Eratosthenes = (n: number) => {
-  const numbers = Array.from({ length: n + 1 }, () => true);
-  numbers[0] = numbers[1] = false;
-
-  for (let i = 2; i * i <= i; ++i) {
-    if (numbers[i]) {
-      for (let j = i * i; j <= i; j += i) {
-        numbers[j] = false;
-      }
+/**
+ * 입력된 숫자 `n`이 소수인지 판별합니다.
+ * @param n
+ */
+export function isPrime(n: number): boolean {
+  for (let m = 3; m <= Math.sqrt(n); m += 2) {
+    if (n % m === 0) {
+      return false;
+    }
+    if (m * m > n) {
+      return true;
     }
   }
 
-  return numbers;
+  return n >= 2;
+}
+
+export const Sieve = {
+  /**
+   * 초기화된 에라토스테네스의 체를 반환합니다.
+   * @param maximum
+   */
+  init(maximum: number = 1_000_000): number[] {
+    console.assert(maximum >= 2, "Invalid maximum: ");
+
+    const sieve = new Array(maximum + 1).fill(1);
+    sieve[0] = sieve[1] = 0;
+
+    for (let i = 2; i * i <= maximum; ++i) {
+      if (sieve[i]) {
+        for (let j = i * i; j <= maximum; j += i) {
+          sieve[j] = 0;
+        }
+      }
+    }
+
+    return sieve;
+  },
 };
 
-export const is_prime_number = (n: number): boolean => {
-  if (n <= 1) return false;
-  if (n <= 3) return true;
-  if (n % 2 === 0 || n % 3 === 0) return false;
+export class PrimeSys {
+  map: number[];
+  primes: number[];
 
-  for (let i = 5; i * i <= n; i += 6) {
-    if (n % i === 0 || n % (i + 2) === 0) return false;
+  constructor(max: number) {
+    const sieve = Sieve.init(max);
+    const primes = [2];
+
+    for (let n = 3, i = 0; n <= max; n += 2) {
+      if (sieve[n]) {
+        sieve[n] = ++i;
+        primes.push(n);
+      }
+    }
+
+    this.map = sieve;
+    this.primes = primes;
   }
 
-  return true;
-};
-
-export const is_prime_number2 = (n: number): boolean => {
-  if (n <= 1) return false;
-  if (n <= 3) return true;
-  if (n % 2 === 0 || n % 3 === 0) return false;
-
-  const sqrt_n = Math.sqrt(n);
-  for (let i = 5; i <= sqrt_n; i += 2) {
-    if (n % i === 0) return false;
+  /**
+   * 입력된 숫자 `n`이 소수인지 판별합니다.
+   * @param n
+   */
+  has(n: number) {
+    return this.map[n] !== 0;
   }
 
-  return true;
-};
+  close() {
+    // 이분 탐색
+  }
 
-export const get_primes_of = (n: number): number[] => {
-  return [0];
-};
+  /**
+   * 숫자 `a`와 `b` 사이의 소수 목록을 반환합니다.
+   * @param a
+   * @param b
+   */
+  between(a: number, b: number): number[] {
+    let i = this.map[a]!;
+    let j = this.map[b]!;
 
-export const get_primes_in_range = (a: number, b: number) => {
-  if (a > b) [a, b] = [b, a];
-  const primes = [];
-  if (a <= 2) a = 2;
-  for (let i = a; i <= b; ++i) is_prime_number(i) && primes.push(i);
-  return primes;
-};
+    if (i === undefined || j === undefined) {
+      throw new Error("Invalid index: ");
+    }
 
-export const get_primes_in_range2 = (a: number, b: number) => {
-  if (a > b) [a, b] = [b, a];
-  const primes = a <= 2 ? [2] : [];
-  if (a <= 3) a = 3;
-  if (a % 2 === 0) a++;
-  for (let i = a; i <= b; i += 2) is_prime_number(i) && primes.push(i);
-  return primes;
-};
+    if (i === 0) {
+    }
 
-export const count_primes_of = (_n: number) => {};
+    if (j === 0) {
+    }
 
-export const count_primes_in_range = (a: number, b: number) => {
-  let count = a <= 2 ? 1 : 0;
-  if (a <= 3) a = 3;
-  a % 2 === 0 && a++;
-  for (let i = a; i <= b; i += 2) is_prime_number(i) && ++count;
-  return count;
-};
+    return [];
+  }
+
+  /**
+   * 숫자 `max`까지의 소수 목록을 반환합니다.
+   * @param max
+   */
+  upTo(max: number): number[] {
+    const slc = [] as number[];
+    const ei = this.map[max]!;
+    if (ei === 0) {
+    }
+
+    for (let i = -1; ++i <= ei; ) slc.push(this.primes[i]!);
+    return slc;
+  }
+}
