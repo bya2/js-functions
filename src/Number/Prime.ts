@@ -1,32 +1,18 @@
-// 소수 판별
-// [범위 내] 소수의 개수
-// [범위 내] 소수 목록
-
-export function binarySearchIndex(arr: number[], n: number): number {
-  let si = 0;
-  let ei = arr.length - 1;
-
-  while (si <= ei) {
-    let mi = (si + ei) >> 1;
-    if (arr[mi] === n) return mi;
-    if (arr[mi]! < n) si = ++mi;
-    else ei = --mi;
-  }
-
-  return -1;
-}
+// 기능
+// - 소수 판별: isPrime, has
+// - [범위 내] 소수의 개수
+// - [범위 내] 소수 목록: between, upTo
 
 /**
  * 입력된 숫자 `n`이 소수인지 판별합니다.
  * @param n
  */
 export function isPrime(n: number): boolean {
-  for (let m = 3; m <= Math.sqrt(n); m += 2) {
+  const SQRT_N = Math.sqrt(n);
+
+  for (let m = 3; m <= SQRT_N; m += 2) {
     if (n % m === 0) {
       return false;
-    }
-    if (m * m > n) {
-      return true;
     }
   }
 
@@ -38,7 +24,7 @@ export const Sieve = {
    * 초기화된 에라토스테네스의 체를 반환합니다.
    * @param maximum
    */
-  init(maximum: number = 1_000_000): number[] {
+  upTo(maximum = 1_000_000): number[] {
     console.assert(maximum >= 2, "Invalid maximum: ");
 
     const sieve = new Array(maximum + 1).fill(1);
@@ -56,22 +42,30 @@ export const Sieve = {
   },
 };
 
-export class PrimeSys {
-  map: number[];
+export class PrimeSet {
+  sieve: number[];
+  map: Record<number, number>;
   primes: number[];
 
-  constructor(max: number) {
-    const sieve = Sieve.init(max);
+  /**
+   * Primes Utils
+   * @param max
+   */
+  constructor(sieve: number[] = Sieve.upTo()) {
+    const MAX = sieve.length - 1;
+
+    const map = { 2: 0 };
     const primes = [2];
 
-    for (let n = 3, i = 0; n <= max; n += 2) {
+    for (let n = 3, i = 0; n <= MAX; n += 2) {
       if (sieve[n]) {
-        sieve[n] = ++i;
+        map[n] = ++i;
         primes.push(n);
       }
     }
 
-    this.map = sieve;
+    this.sieve = sieve;
+    this.map = map;
     this.primes = primes;
   }
 
@@ -83,8 +77,22 @@ export class PrimeSys {
     return this.map[n] !== 0;
   }
 
-  close() {
-    // 이분 탐색
+  /**
+   * `this`의 `primes`에 대한 이분 탐색을 통해 숫자 `n`의 인덱스를 반환합니다.
+   * @param n
+   */
+  binarySearch(n: number): number {
+    let si = 0;
+    let ei = this.primes.length - 1;
+
+    while (si <= ei) {
+      let mi = (si + ei) >> 1;
+      if (this.primes[mi] === n) return mi;
+      if (this.primes[mi]! < n) si = ++mi;
+      else ei = --mi;
+    }
+
+    return -1;
   }
 
   /**
@@ -93,6 +101,17 @@ export class PrimeSys {
    * @param b
    */
   between(a: number, b: number): number[] {
+    if (a > b) {
+      const tmp = a;
+      a = b;
+      b = tmp;
+    }
+
+    if (a < 0) {
+      if (b < 2) return [];
+      a = 0;
+    }
+
     let i = this.map[a]!;
     let j = this.map[b]!;
 
