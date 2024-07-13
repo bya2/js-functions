@@ -1,12 +1,12 @@
-import B, { createMaxHeap, createMinHeap } from ".";
+import B, { MaxHeap, MinHeap } from ".";
 
 const inputs = [1, 3, 5, 7, 9];
 
 describe("MaxHeap methods", () => {
-  const maxHeap = createMaxHeap();
+  const maxHeap = MaxHeap();
 
   test(".siftUp", () => {
-    const maxHeap = createMaxHeap();
+    const maxHeap = MaxHeap();
   });
   test(".siftDown", () => {});
   test(".siftDownToBottom", () => {});
@@ -15,7 +15,7 @@ describe("MaxHeap methods", () => {
 });
 
 describe("MinHeap methods", () => {
-  const minHeap = createMinHeap();
+  const minHeap = MinHeap();
 
   test(".siftUp", () => {});
   test(".siftDown", () => {});

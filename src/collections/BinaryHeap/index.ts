@@ -1,5 +1,4 @@
 import Hole from "./Hole";
-import { swap } from "@/utils";
 
 type TCompareFn<T> = (a: T, b: T) => unknown;
 
@@ -36,11 +35,13 @@ export default class BinaryHeap<T> {
    * @param pos 대상 노드 인덱스
    */
   siftUp(start: number, pos: number): number {
+    const compare = this.compare;
+
     const hole = new Hole(this.#inner, pos);
 
     while (hole.pos > start) {
       const parent = (hole.pos - 1) >> 1;
-      if (this.compare(hole.get(parent), hole.element)) break;
+      if (compare(hole.get(parent), hole.element)) break;
       hole.moveTo(parent);
     }
 
@@ -53,19 +54,21 @@ export default class BinaryHeap<T> {
    * @param end 정렬 범위 최하위 노드 인덱스
    */
   siftDown(pos: number, end: number): void {
+    const compare = this.compare;
+
     const hole = new Hole(this.#inner, pos);
 
     let child = 2 * hole.pos + 1;
     const leaf = end - 2 || 0;
 
     while (child <= leaf) {
-      if (this.compare(hole.get(child + 1), hole.get(child))) child++;
-      if (this.compare(hole.element, hole.get(child))) return;
+      if (compare(hole.get(child + 1), hole.get(child))) child++;
+      if (compare(hole.element, hole.get(child))) return;
       hole.moveTo(child);
       child = 2 * hole.pos + 1;
     }
 
-    if (child === end - 1 && this.compare(hole.get(child), hole.element)) {
+    if (child === end - 1 && compare(hole.get(child), hole.element)) {
       hole.moveTo(child);
     }
   }
@@ -75,6 +78,8 @@ export default class BinaryHeap<T> {
    * @param pos 대상 노드 인덱스
    */
   siftDownToBottom(pos: number): void {
+    const compare = this.compare;
+
     const end = this.#inner.length;
     const hole = new Hole(this.#inner, pos);
 
@@ -82,7 +87,7 @@ export default class BinaryHeap<T> {
     const leaf = end - 2 || 0;
 
     while (child <= leaf) {
-      if (this.compare(hole.get(child + 1), hole.get(child))) child++;
+      if (compare(hole.get(child + 1), hole.get(child))) child++;
       hole.moveTo(child);
       child = 2 * hole.pos + 1;
     }
@@ -110,8 +115,12 @@ export default class BinaryHeap<T> {
    */
   pop() {
     let item = this.#inner.pop();
+
     if (item !== undefined) {
-      swap(item, this.#inner[0]);
+      const x = item;
+      item = this.#inner[0];
+      this.#inner[0] = x;
+
       this.siftDownToBottom(0);
     }
     return item;
@@ -119,11 +128,11 @@ export default class BinaryHeap<T> {
 }
 
 /**
- * @returns Max-Heap
+ * @returns Max-Heap instance
  */
-export const createMaxHeap = () => new BinaryHeap<number>((a, b) => a > b);
+export const MaxHeap = () => new BinaryHeap<number>((a, b) => a > b);
 
 /**
- * @returns Min-Heap
+ * @returns Min-Heap instance
  */
-export const createMinHeap = () => new BinaryHeap<number>((a, b) => a < b);
+export const MinHeap = () => new BinaryHeap<number>((a, b) => a < b);

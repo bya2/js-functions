@@ -1,38 +1,43 @@
-import { IntoNeighbors } from "../types";
+interface IntoNeighbors<N> {
+  neighbors(node: N): Iterable<N>;
+}
 
-export default class DFS<N, G extends IntoNeighbors<N>> {
+interface ISearch<N> {
+  moveTo(node: N): void;
+  next(validator: (node: N) => unknown): N | undefined;
+}
+
+export default class DFS<N, G extends IntoNeighbors<N>> implements ISearch<N> {
   stack: N[];
   discovered: Set<N>;
   graph: G;
   validator: (node: N) => unknown;
 
-  constructor(graph: G, root: N, validator?: (node: N) => unknown) {
+  constructor(graph: G, validator?: (node: N) => unknown) {
     this.graph = graph;
-    this.stack = [root];
-    this.discovered = new Set([root]);
+    this.stack = [];
+    this.discovered = new Set();
     this.validator = validator ?? (() => true);
   }
 
-  moveTo(node: N): void {
+  moveTo(node: N) {
     this.stack.length = 0;
     this.stack.push(node);
   }
 
   next(validator = this.validator): N | undefined {
-    const { stack, discovered, graph } = this;
+    while (this.stack.length) {
+      const node = this.stack.pop()!;
 
-    while (stack.length) {
-      const node = stack.pop()!;
-
-      if (discovered.has(node) || !validator(node)) {
+      if (this.discovered.has(node) || !validator(node)) {
         continue;
       }
 
-      discovered.add(node);
+      this.discovered.add(node);
 
-      for (const succ of graph.neighbors(node)) {
-        if (!discovered.has(succ)) {
-          stack.push(succ);
+      for (const succ of this.graph.neighbors(node)) {
+        if (!this.discovered.has(succ)) {
+          this.stack.push(succ);
         }
       }
 
@@ -48,20 +53,18 @@ export default class DFS<N, G extends IntoNeighbors<N>> {
   }
 
   *iter(validator = this.validator): Generator<N> {
-    const { stack, discovered, graph } = this;
+    while (this.stack.length) {
+      const node = this.stack.pop()!;
 
-    while (stack.length) {
-      const node = stack.pop()!;
-
-      if (discovered.has(node) || !validator(node)) {
+      if (this.discovered.has(node) || !validator(node)) {
         continue;
       }
 
-      discovered.add(node);
+      this.discovered.add(node);
 
-      for (const succ of graph.neighbors(node)) {
-        if (!discovered.has(succ)) {
-          stack.push(succ);
+      for (const succ of this.graph.neighbors(node)) {
+        if (!this.discovered.has(succ)) {
+          this.stack.push(succ);
         }
       }
 

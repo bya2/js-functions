@@ -1,4 +1,4 @@
-import SLL from "@/collections/SLL";
+import SLL from "@/collections/LinkedList/SLL";
 import { IntoNeighbors } from "../types";
 
 export default class BFS<N, G extends IntoNeighbors<N>> {
@@ -7,10 +7,10 @@ export default class BFS<N, G extends IntoNeighbors<N>> {
   graph: G;
   validator: (node: N) => unknown;
 
-  constructor(graph: G, root: N, validator?: (node: N) => unknown) {
+  constructor(graph: G, validator?: (node: N) => unknown) {
     this.graph = graph;
-    this.queue = new SLL(root);
-    this.discovered = new Set([root]);
+    this.queue = new SLL();
+    this.discovered = new Set();
     this.validator = validator ?? (() => true);
   }
 

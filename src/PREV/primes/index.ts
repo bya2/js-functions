@@ -1,0 +1,3 @@
+interface IPrimes {
+  firstFac(): number[];
+}

@@ -10,6 +10,12 @@ export default class Hole<T> {
     this.element = data[pos]!;
   }
 
+  swap(i: number, j: number) {
+    const tmp = this.#arr[i]!;
+    this.#arr[i] = this.#arr[j]!;
+    this.#arr[j] = tmp;
+  }
+
   /**
    * 참조하는 배열의 `index`에 위치하는 요소를 반환합니다.
    * @param index
@@ -17,6 +23,7 @@ export default class Hole<T> {
   get(index: number): T {
     console.assert(index !== this.pos);
     console.assert(index >= 0 && index < this.#arr.length);
+
     return this.#arr[index]!;
   }
 
@@ -29,7 +36,8 @@ export default class Hole<T> {
   moveTo(index: number): void {
     console.assert(index !== this.pos);
     console.assert(index >= 0 && index < this.#arr.length);
-    this.#arr.swap(index, this.pos);
+
+    this.swap(index, this.pos);
     this.pos = index;
   }
 }
