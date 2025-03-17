@@ -1,0 +1,1 @@
+tsc-watch --onSuccess "node ./exec/index.js"

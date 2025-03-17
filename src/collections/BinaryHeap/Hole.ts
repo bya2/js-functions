@@ -1,3 +1,5 @@
+import { swap } from "@/misc/utils";
+
 export default class Hole<T> {
   element: T;
   pos: number;
@@ -8,12 +10,6 @@ export default class Hole<T> {
     this.#arr = data;
     this.pos = pos;
     this.element = data[pos]!;
-  }
-
-  swap(i: number, j: number) {
-    const tmp = this.#arr[i]!;
-    this.#arr[i] = this.#arr[j]!;
-    this.#arr[j] = tmp;
   }
 
   /**
@@ -36,8 +32,7 @@ export default class Hole<T> {
   moveTo(index: number): void {
     console.assert(index !== this.pos);
     console.assert(index >= 0 && index < this.#arr.length);
-
-    this.swap(index, this.pos);
+    swap(this.#arr, index, this.pos);
     this.pos = index;
   }
 }

@@ -1,4 +1,4 @@
-import SLL from "@/collections/LinkedList/SLL";
+import SLL from "@/collections/LinkedList/prev/SLL";
 import { IntoNeighbors } from "../types";
 
 export default class BFS<N, G extends IntoNeighbors<N>> {

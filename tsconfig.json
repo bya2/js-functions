@@ -5,10 +5,10 @@
     "paths": {
       "@/*": ["src/*"],
       "@collections/*": ["src/collections/*"],
-      "@/graphs/*": ["src/graphs/*"]
+      "@graphs/*": ["src/graphs/*"]
     },
     "noImplicitAny": false
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/misc/utils/etc.js"],
   "exclude": ["node_modules", "dist"]
 }
